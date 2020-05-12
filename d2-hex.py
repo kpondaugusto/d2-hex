@@ -15,7 +15,7 @@ print('Flow perimeter %f cm'%(p*100))
 print('Hydraulic diameter %f cm'%(dh*100))
 
 
-mdot=0.004 # (kg/s) mass flow rate
+mdot=0.003 # (kg/s) mass flow rate
 G=mdot/a # (kg/(m^2*s)) mass flow rate per unit area
 
 print('G is %f kg/(m^2*s)'%G)
