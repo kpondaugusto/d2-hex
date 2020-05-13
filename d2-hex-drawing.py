@@ -75,16 +75,13 @@ for groove in range(ngrooves):
 
     xsl=r*cos(alpha+dalpha)
     ysl=r*sin(alpha+dalpha)
-
     xel=xsl-d*cos(alpha)
     yel=ysl-d*sin(alpha)
     
     xsr=r*cos(alpha-dalpha)
     ysr=r*sin(alpha-dalpha)
-
     xer=xsr-d*cos(alpha)
     yer=ysr-d*sin(alpha)
-
     
     # draw line at edge of each groove
     line=plt.plot([xsl,xel],[ysl,yel],color='black')
@@ -103,5 +100,24 @@ parc=(theta-2*dalpha_deg)*pi/180*r # outer arc length between two grooves
 perimeter=ngrooves*(pgroove+parc)
 
 print(pgroove,parc,perimeter)
+
+# Calculation of area for flow
+annulus=pi*(d2**2-d1**2)
+agroove=d*w # area of one groove # approximately
+aeps=((2*dalpha)/(2*pi))*pi*r**2-2*0.5*(w/2)*(r*cos(dalpha)) # area
+                                                             # between
+                                                             # the arc
+                                                             # and the
+                                                             # area of
+                                                             # the
+                                                             # groove
+                                                             # on the
+                                                             # previous
+                                                             # line
+agroove_total=agroove+aeps
+agrooves=agroove_total*ngrooves
+area=annulus+agrooves
+
+print(annulus,agroove,aeps,agrooves,area)
 
 plt.show()
