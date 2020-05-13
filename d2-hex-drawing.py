@@ -102,7 +102,7 @@ perimeter=ngrooves*(pgroove+parc)
 print(pgroove,parc,perimeter)
 
 # Calculation of area for flow
-annulus=pi*(d2**2-d1**2)
+annulus=pi*(d2**2-d1**2)/4
 agroove=d*w # area of one groove # approximately
 aeps=((2*dalpha)/(2*pi))*pi*r**2-2*0.5*(w/2)*(r*cos(dalpha)) # area
                                                              # between
