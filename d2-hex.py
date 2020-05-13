@@ -48,15 +48,26 @@ jH=0.023*Re**(-0.2) # dimentionless
 
 print('The J factor is %f.'%jH)
 
-c=3e8 #(m/s) speed of light
-
 #thermal conductivity
 
 kt=0.104 #W/mK
 
+#specific heat
+
+import CoolProp.CoolProp as CP
+import numpy as np
+fluid='Deuterium'
+
+T=20 #K
+C=CP.PropsSI('C','P',p,'T',T,fluid)
+print('The specific heat is %f kg/mK.' %C)  #(kg/mK) found from coolprop - found via a table
+cd=CP.PropsSI('d(Hmass)/d(T)|P','P',p,'T',T,fluid)
+print('The specific heat is %f kg/mK, found from derivatives.' %cd)  #(kg/mK) found from coolprop - found via derivatives
+
+
 #Prandtl Number
 
-Pr=(mu*c)/(kt) #yes still dimentionless
+Pr=(mu*C)/(kt) #yes still dimentionless
 
 print('The Prandtl Number is %f.'%Pr)
 
@@ -68,7 +79,7 @@ Nu=jH*Re*Pr**(1/3) #more dimentionless numbers
 
 print('The Nusselt Numebr is %f.'%Nu)
 
-ro=165#(kg/m^3) denstiy
+ro=171#(kg/m^3) denstiy
 
 L=4.007 #(m) length of tube(s)
 
@@ -81,9 +92,9 @@ print('The pressure drop is %f Pa.'%p)
 
 #convective heat transfer coefficient
 
-hc=(dh)/(Nu*kt) #m^2k/W
+hc=(Nu*kt)/dh #W/m^2k
 
-print('The convective heat transfer coefficient is %f m^2k/W.'%hc)
+print('The convective heat transfer coefficient is %f W/m^2K.'%hc)
 
 
 
