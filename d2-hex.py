@@ -26,17 +26,20 @@ print('G is %f kg/(m^2*s)'%G)
 
 mu=3.5e-5 # Pa*s
 
-Re=dh*G/mu # should be dimensionless
+Re=dh*G/mu # should be dimensionless, check: (m)*(kg/(m^2*s))/(Pa*s) =
+           # kg/(Pa*m*s^2) = 1
+           # because Pa = force/area = kg*m/(s^2*m^2) = kg/(s^2*m)
+           # so, yes, this is dimensionless
 
 print('The Reynolds number is %f'%Re)
 
 Re2=4*mdot/(p*mu)
 
-print('The Reynolds number is %f'%Re2)
+print('A cross-check on the Reynolds number is %f'%Re2)
 
 #friction factor
 
-f_lam=64/Re # for Re < 2300 (laminar flow), dimentionless
+f_lam=64/Re # for Re < 2300 (laminar flow), dimensionless
 
 f_turb=0.316*Re**(-0.25) #for 3500 < Re < 20000 (turbulent flow), again dimentionless
 
@@ -44,9 +47,9 @@ print('The friction factor is %f.'%f_lam)
 
 #Colburn J factor
 
-jH=0.023*Re**(-0.2) # dimentionless
+jH=0.023*Re**(-0.2) # dimensionless
 
-print('The J factor is %f.'%jH)
+print('Colburn\'s J factor is %f.'%jH)
 
 #thermal conductivity
 
