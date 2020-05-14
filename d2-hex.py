@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from math import pi
+from math import log
 
 d2=4.76*0.0254 # (m) inner diameter of the outer tubular housing
 d1=4.65*0.0254 # (m) diameter of the inner cold cylinder
@@ -95,6 +96,13 @@ print('The specific heat is %f kg/(m*K), found from derivatives.' %cd)
 # gives liquid Cp=5852 J/(kg*K) at T=20 K and saturation.
 # Very good agreement with the subcooled value above!
 
+#Colburn J factor
+
+#jH_turb=0.023*Re**(-0.2) # dimentionless
+
+#jH=(hc*Pr**(2/3))/(C*G)
+
+#print('The J factor is %f.'%jH)
 
 #Prandtl Number
 
@@ -108,11 +116,50 @@ print('The Prandtl Number is %f.'%Pr)
 
 Nu=jH*Re*Pr**(1/3) #more dimentionless numbers
 
-print('The Nusselt Number is %f.'%Nu)
+print('The Nusselt Numebr is %f.'%Nu)
 
 ro=171#(kg/m^3) denstiy
 
 L=4.007 #(m) length of tube(s)
+
+#Graetz Number
+
+Gz=(Re*Pr*dh)/(L) #dimentionless
+                  #b/c m/m = 1
+
+print('The Graetz Numebr is %f.'%Gz)
+
+Gz_sh=(Re*Pr*p)/(4*L) #dimentionless
+                      #b/c m/m = 1
+
+print('The Graetz Numebr from Shah is %f.'%Gz_sh)
+
+#Nu from Gz
+
+Nu2=3.657 + ((0.0668*Gz)/(1+0.04*Gz**(2/3)))
+
+print('The Nusselt Numebr from Gz is %f.' %Nu2)
+
+#axial distance from shah and london
+
+xstar=p/(4*dh*Gz)#dimentionless
+                 #b/c m/m = 1
+
+print('The dimentionless axial distance is %f.'%xstar)
+
+xstar2=pi/(4*Gz) #dimentionless
+
+print('The dimentionless axial distance is %f.'%xstar2)
+
+rstar=(d2/2)/(d1/2) #dimentionless
+
+print('This is rstar %f.' %rstar)
+
+rmstar=((1-rstar**2)/(2*log(1/rstar**2)))**(1/2) #dimentionless???
+
+f_shah=(16*(1-rstar)**2)/((1+rstar**2-2*rmstar**2)*Re)
+
+print('The friction factor from shah is %f.'%f_shah)
 
 #pressure drop
 
@@ -126,6 +173,4 @@ print('The pressure drop is %f Pa.'%p)
 hc=(Nu*kt)/dh #W/m^2k
 
 print('The convective heat transfer coefficient is %f W/m^2K.'%hc)
-
-
 
