@@ -16,6 +16,7 @@ print('Hydraulic diameter %f cm'%(dh*100))
 
 
 mdot=0.003 # (kg/s) mass flow rate
+
 G=mdot/a # (kg/(m^2*s)) mass flow rate per unit area
 
 print('G is %f kg/(m^2*s)'%G)
@@ -45,17 +46,27 @@ f_turb=0.316*Re**(-0.25) #for 3500 < Re < 20000 (turbulent flow), again dimentio
 
 print('The friction factor is %f.'%f_lam)
 
-#Colburn J factor
+# Colburn J factor
 
 jH=0.023*Re**(-0.2) # dimensionless
 
 print('Colburn\'s J factor is %f.'%jH)
 
-#thermal conductivity
+# thermal conductivity
 
-kt=0.104 #W/mK
+kt=0.104 # W/(m*K) a check on this number from
+         # https://nvlpubs.nist.gov/nistpubs/Legacy/TN/nbstechnicalnote641.pdf
+         # gives the value of about 1.05 mW/(cm*K) = 0.105 W/(m*K) at
+         # a temperature of about 22 K.  It says in this reference
+         # that the data is uncertain at the 25% level, though.
 
-#specific heat
+# Jeff tried this and it failed:
+# kt_trial=CP.PropsSI('CONDUCTIVITY','P',p,'T',T,fluid)
+# print('According to CoolProp the thermal conductivity is %f W/(m*K)'%kt_trial)
+
+
+
+# specific heat
 
 import CoolProp.CoolProp as CP
 import numpy as np
@@ -66,7 +77,6 @@ C=CP.PropsSI('C','P',p,'T',T,fluid)
 print('The specific heat is %f kg/mK.' %C)  #(kg/mK) found from coolprop - found via a table
 cd=CP.PropsSI('d(Hmass)/d(T)|P','P',p,'T',T,fluid)
 print('The specific heat is %f kg/mK, found from derivatives.' %cd)  #(kg/mK) found from coolprop - found via derivatives
-
 
 #Prandtl Number
 
