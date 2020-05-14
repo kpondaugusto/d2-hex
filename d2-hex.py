@@ -42,12 +42,6 @@ f_turb=0.316*Re**(-0.25) #for 3500 < Re < 20000 (turbulent flow), again dimentio
 
 print('The friction factor is %f.'%f_lam)
 
-#Colburn J factor
-
-jH=0.023*Re**(-0.2) # dimentionless
-
-print('The J factor is %f.'%jH)
-
 #thermal conductivity
 
 kt=0.104 #W/mK
@@ -64,6 +58,13 @@ print('The specific heat is %f kg/mK.' %C)  #(kg/mK) found from coolprop - found
 cd=CP.PropsSI('d(Hmass)/d(T)|P','P',p,'T',T,fluid)
 print('The specific heat is %f kg/mK, found from derivatives.' %cd)  #(kg/mK) found from coolprop - found via derivatives
 
+#Colburn J factor
+
+jH_turb=0.023*Re**(-0.2) # dimentionless
+
+jH=(hc*Pr**(2/3))/(C*G)
+
+print('The J factor is %f.'%jH)
 
 #Prandtl Number
 
@@ -71,11 +72,9 @@ Pr=(mu*C)/(kt) #yes still dimentionless
 
 print('The Prandtl Number is %f.'%Pr)
 
-
 #Nusselt Number
 
 Nu=jH*Re*Pr**(1/3) #more dimentionless numbers
-
 
 print('The Nusselt Numebr is %f.'%Nu)
 
@@ -95,6 +94,4 @@ print('The pressure drop is %f Pa.'%p)
 hc=(Nu*kt)/dh #W/m^2k
 
 print('The convective heat transfer coefficient is %f W/m^2K.'%hc)
-
-
 
