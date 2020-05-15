@@ -120,7 +120,7 @@ print('The Nusselt Numebr is %f.'%Nu)
 
 ro=171#(kg/m^3) denstiy
 
-L=4.007 #(m) length of tube(s)
+L=10.*0.0254 # (m) length of tube(s)
 
 #Graetz Number
 
