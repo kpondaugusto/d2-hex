@@ -1,72 +1,35 @@
 #!/usr/bin/python3
 
 from math import pi,cos,sin,asin
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 d2=4.76*0.0254 # (m) inner diameter of the outer tubular housing
-d1=4.65*0.0254 # (m) diameter of the inner cold cylinder
+d1=4.75*0.0254 # (m) diameter of the inner cold cylinder before
+               # cutting any grooves
 
-a=pi*(d2**2-d1**2)/4 # (m^2) area for fluid flow
-p=pi*(d2+d1) # (m) perimeter of flow region
-
-dh=4*a/p # (m) hydraulic diameter
-
-print('Flow area %f cm^2'%(a*(100)**2))
-print('Flow perimeter %f cm'%(p*100))
-print('Hydraulic diameter %f cm'%(dh*100))
-
-
-mdot=0.003 # (kg/s) mass flow rate
-G=mdot/a # (kg/(m^2*s)) mass flow rate per unit area
-
-print('G is %f kg/(m^2*s)'%G)
-
-# 350 micro-poise at 20.5 K.... this is at saturation, but probably
-# close enough to 20 psia.
-# https://nvlpubs.nist.gov/nistpubs/Legacy/TN/nbstechnicalnote641.pdf 
-
-mu=3.5e-5 # Pa*s
-
-Re=dh*G/mu # should be dimensionless
-
-print('The Reynolds number is %f'%Re)
-
-Re2=4*mdot/(p*mu)
-
-print('The Reynolds number is %f'%Re2)
-
-# Make drawing
-
-import matplotlib.pyplot as plt
-
-circle1=plt.Circle((0,0),d2/2,color='r',fill=False)
-
-fig, ax = plt.subplots() # note we must use plt.subplots, not plt.subplot
-# (or if you have an existing figure)
-# fig = plt.gcf()
-# ax = fig.gca()
-
-ax.add_artist(circle1)
+fig,ax=plt.subplots()
 
 ax.set_xlim([-d2/2,d2/2])
 ax.set_ylim([-d2/2,d2/2])
 
-import matplotlib.patches as patches
+# outer housing
+circle1=plt.Circle((0,0),d2/2,color='r',fill=False)
+ax.add_artist(circle1)
 
-#arc=patches.Arc((0,0),d1/2,d1/2,45,0,90)
-#ax.add_patch(arc)
+groove_depth=0.1*0.0254 # m
+groove_width=0.06*0.0254 # m
+ngrooves=124
 
-dtop=d1 # m
-groove_depth=0.01 # m
-groove_width=0.001 # m
-ngrooves=200
+# shorter names
+r=d1/2
+w=groove_width
+d=groove_depth
 
 for groove in range(ngrooves):
     theta=360./ngrooves
     center_angle=groove*theta
-    print(groove,center_angle)
-    r=dtop/2
-    w=groove_width
-    d=groove_depth
+
     alpha=center_angle*pi/180
     x=r*cos(alpha)
     y=r*sin(alpha)
@@ -99,7 +62,11 @@ pgroove=2*d+w # inner "U" of a groove
 parc=(theta-2*dalpha_deg)*pi/180*r # outer arc length between two grooves
 perimeter=ngrooves*(pgroove+parc)
 
-print(pgroove,parc,perimeter)
+print('The length of the inner U of a groove is %f m'%pgroove)
+print('The length of an arc between two grooves is %f m'%parc)
+print('The length around all those fins and grooves is %f m'%perimeter)
+
+print()
 
 # Calculation of area for flow
 annulus=pi*(d2**2-d1**2)/4
@@ -118,6 +85,42 @@ agroove_total=agroove+aeps
 agrooves=agroove_total*ngrooves
 area=annulus+agrooves
 
-print(annulus,agroove,aeps,agrooves,area)
+
+print('Area of annular region between cylinders %f m^2'%annulus)
+print('Additional area cut out by each groove %f m^2'%(agroove+aeps))
+print('Area of all the grooves %f m^2'%agrooves)
+print('Total flow area %f m^2'%area)
+print()
+
+a=area # (m^2) area for fluid flow
+p=perimeter+pi*d2 # (m) perimeter of flow region
+
+dh=4*a/p # (m) hydraulic diameter
+
+print('Flow area %f m^2'%a)
+print('Flow perimeter %f m'%p)
+print('Hydraulic diameter %f m'%dh)
+print()
+
+mdot=0.004 # (kg/s) mass flow rate
+G=mdot/a # (kg/(m^2*s)) mass flow rate per unit area
+
+print('G is %f kg/(m^2*s)'%G)
+
+# 350 micro-poise at 20.5 K.... this is at saturation, but probably
+# close enough to 20 psia.
+# https://nvlpubs.nist.gov/nistpubs/Legacy/TN/nbstechnicalnote641.pdf 
+
+mu=3.5e-5 # Pa*s
+
+Re=dh*G/mu # should be dimensionless
+
+print('The Reynolds number is %f'%Re)
+
+Re2=4*mdot/(p*mu)
+
+print('The Reynolds number is %f'%Re2)
+
+
 
 plt.show()
