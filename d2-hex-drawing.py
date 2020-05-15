@@ -114,13 +114,7 @@ print('G is %f kg/(m^2*s)'%G)
 mu=3.5e-5 # Pa*s
 
 Re=dh*G/mu # should be dimensionless
-
 print('The Reynolds number is %f'%Re)
-
-Re2=4*mdot/(p*mu)
-
-print('The Reynolds number is %f'%Re2)
-
 
 
 plt.show()
