@@ -1,0 +1,29 @@
+The length of the inner U of a groove is 0.006604 m
+The length of an arc between two grooves is 0.001533 m
+The length around all those fins and grooves is 1.008948 m
+
+Area of annular region between cylinders 0.000048 m^2
+Additional area cut out by each groove 0.000004 m^2
+Area of all the grooves 0.000481 m^2
+Total flow area 0.000529 m^2
+
+Flow area 0.000529 m^2
+Flow perimeter 1.388779 m
+Hydraulic diameter 0.001523 m
+
+Length of tubes 0.254000 m
+Area of cold wall 0.256273 m^2
+
+G is 7.564393 kg/(m^2*s)
+The Reynolds number is 329.168843
+The Prandtl Number is 2.209513.
+The heat transfer coefficient is 249.715564 W/(m^2*K)
+The number of transfer units is 2.436836
+
+For inlet temperature 23.400000 K and wall temperature 20.700000
+the outlet temperature is 20.936080
+and the total heat transfer rate is 64.706573
+
+The friction factor is 0.194429
+The density is 163.292488 kg/m^3
+The pressure drop is 5.681124 Pa
