@@ -195,4 +195,4 @@ print('The density is %f kg/m^3'%rho)
 dp=(f*L*G**2)/(dh*2*rho) #(Pa)
 print('The pressure drop is %f Pa'%dp)
 
-plt.show()
+#plt.show()
