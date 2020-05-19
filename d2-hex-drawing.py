@@ -159,11 +159,16 @@ print('The Prandtl Number is %f.'%Pr)
 
 #Nu_3_ii=4.8608 # Table 90 of Shah and London
 
-Nu=3.657 # circular duct Barron Eq. (6.30)
+#Nu=3.657 # circular duct Barron Eq. (6.30)
 #Nu=7.541 # Table 6.2 Barron -- parallel plate =~ thin annulus?
+#NuT=7.541 # Table 86 of Shah and London, thin annulus
+#NuT=7.541 # Table 138 of Shah and London, parallel plate
+#NuT=4.861 # Table 138 of Shah and London, parallel plate one side insulated
+Nu=4.8608 # Eq. (283) Shah and London, parallel plate one side insulated
 
-fRe=64.00 # circular duct Barron Eq. (6.27)
+#fRe=64.00 # circular duct Barron Eq. (6.27)
 #fRe=96.00 # Table 6.2 Barron
+fRe=24.00*4 # Table Table 86 of Shah and London, thin annulus
 
 # calculate heat transfer -- inner surface to fluid
 hc=Nu*kt/dh
@@ -179,9 +184,9 @@ T2=T1-(T1-Tw)*(1-exp(-Ntu))
 
 Qtotal=mdot*Cp*(T1-T2) # Eq. (6.43) of Barron
 
-print('For inlet temperature %f K and wall temperature %f'%(T1,Tw))
-print('the outlet temperature is %f'%T2)
-print('and the total heat transfer rate is %f'%Qtotal)
+print('For inlet temperature %f K and wall temperature %f K'%(T1,Tw))
+print('the outlet temperature is %f K'%T2)
+print('and the total heat transfer rate is %f W'%Qtotal)
 print()
 
 # calculate pressure drop
@@ -192,7 +197,15 @@ print('The friction factor is %f'%f)
 rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
 print('The density is %f kg/m^3'%rho)
 
-dp=(f*L*G**2)/(dh*2*rho) #(Pa)
+dp=(f*L*G**2)/(dh*2*rho) # (Pa) pressure drop
+# unit check:
+# [L]=m
+# [G**2]=kg^2/(s^2*m^4)
+# [dh]=m
+# [rho]=kg/m^3
+# So [p]=(kg^2/(s^2*m^3))/(kg/m^2)=kg/(s^2*m)=(kg*m/s^2)/m^2=[force]/[area]
+# =Pa (as expected)
+
 print('The pressure drop is %f Pa'%dp)
 
 #plt.show()
