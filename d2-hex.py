@@ -120,7 +120,7 @@ print('The Nusselt Numebr is %f.'%Nu)
 
 ro=171#(kg/m^3) denstiy
 
-L=10.*0.0254 # (m) length of tube(s)
+L=0.0254*10 #(m) length of tube(s)
 
 #Graetz Number
 
@@ -151,13 +151,20 @@ xstar2=pi/(4*Gz) #dimentionless
 
 print('The dimentionless axial distance is %f.'%xstar2)
 
+x=10*0.0254 # (m)
+
+lstar1=x/(dh*Re*Pr)#dimentionless
+                 #b/c m/m = 1
+
+print('The lstar is %f.'%lstar1)
+
 rstar=(d2/2)/(d1/2) #dimentionless
 
 print('This is rstar %f.' %rstar)
 
 rmstar=((1-rstar**2)/(2*log(1/rstar**2)))**(1/2) #dimentionless???
 
-f_shah=(16*(1-rstar)**2)/((1+rstar**2-2*rmstar**2)*Re)
+f_shah=(16*(1-rstar)**2)/((1+rstar**2-2*rmstar**2))
 
 print('The friction factor from shah is %f.'%f_shah)
 
