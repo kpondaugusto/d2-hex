@@ -19,7 +19,7 @@ ax.add_artist(circle1)
 
 groove_depth=0.1*0.0254 # m
 groove_width=0.06*0.0254 # m
-ngrooves=124
+n=ngrooves=124
 
 # shorter names
 r=d1/2
@@ -209,3 +209,84 @@ dp=(f*L*G**2)/(dh*2*rho) # (Pa) pressure drop
 print('The pressure drop is %f Pa'%dp)
 
 #plt.show()
+
+
+
+
+#Rectangular Channels in Parallel, Barron 6.3.3, and ex. 6.3
+
+#for one
+
+Af=w*d # (m^2)
+
+Pf=2*w + 2*d # (m)
+
+Dh=4*Af/Pf # (m)
+
+print('The hydraulic diameter for one rectangular channel is %f m.' %Dh)
+
+#all
+
+Afall=d*(n*w) # (m^2)
+
+Pfall=2*d + 2*n*w # (m)
+
+Dhall=4*Afall/Pfall # (m)
+
+
+print('The flow area for all the rectangular channels is %f m^2.' %Afall)
+print()
+
+print('The hydraulic diameter for all the rectangular channels is %f m.' %Dhall)
+
+#Mass flux
+
+Grect=mdot/Afall
+
+Rerect=Dhall*Grect/mu # should be dimensionless
+
+print('The Reynolds number for the rectangles is %f'%Rerect) #still laminar!                                                               #albeit larger than                                                           #the cylinder
+
+#b/a
+
+ba=w/d #dimentionless
+
+print('The b/a is %f.' %ba) # b/c 0.600 I am using C1, C2, from Table 6.2
+
+fRerect=C1=59.94
+
+frect=fRerect/Rerect
+
+print('The friction factor is %f.'%frect)
+
+Nurect=C2=3.205 #Where I used Nu(T) for constant Temperature on a wall (taking                #the one wall to be the outter constant, the other C2=3.896=Nu(Q)             #for constant heat flux at all four walls
+
+hcrect=(Nurect*kt)/Dhall # W/(m^2*K)
+
+print('The hc of the rectangles is %f W/(m^2*K)' %hcrect)
+
+#Wetted area of duct
+
+Awrect = 2*(w + d)*L # (m^2)
+
+print('Wetted area of duct is %f' %Awrect)
+
+#transfer units
+
+Nturect=(hcrect*Awrect)/(mdot*Cp)
+
+print('The transfer units is %f' %Nturect)
+
+#heat transfer
+
+Qrect=mdot*Cp*(T1 - Tw)*(1 - exp(-Nturect)) #W
+
+print('The heat transfer is %f W' %Qrect)
+
+#pressure drop
+
+dprect=(frect*L*Grect**2)/(Dhall*2*rho) #Pa
+
+print('The pressure drop is %f Pa.' %dprect)
+
+
