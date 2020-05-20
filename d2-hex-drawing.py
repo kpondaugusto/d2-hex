@@ -229,7 +229,8 @@ print('The hydraulic diameter for one rectangular channel is %f m.' %Dh)
 
 Afall=d*(n*w) # (m^2)
 
-Pfall=2*d + 2*n*w # (m)
+#Pfall=2*d + 2*n*w # (m)
+Pfall=2*n*d + 2*n*w # (m) # Jeff edited
 
 Dhall=4*Afall/Pfall # (m)
 
@@ -259,21 +260,29 @@ frect=fRerect/Rerect
 
 print('The friction factor is %f.'%frect)
 
-Nurect=C2=3.205 #Where I used Nu(T) for constant Temperature on a wall (taking                #the one wall to be the outter constant, the other C2=3.896=Nu(Q)             #for constant heat flux at all four walls
+Nurect=C2=3.205 #Where I used Nu(T) for constant Temperature on a wall
+                #(taking the one wall to be the outter constant, the
+                #other C2=3.896=Nu(Q) for constant heat flux at all
+                #four walls
 
+                # Jeff says:  I don't fully get the comment above.
+                
 hcrect=(Nurect*kt)/Dhall # W/(m^2*K)
 
 print('The hc of the rectangles is %f W/(m^2*K)' %hcrect)
 
 #Wetted area of duct
 
-Awrect = 2*(w + d)*L # (m^2)
+#Awrect = 2*(w + d)*L # (m^2)
+Aw_wet=(2*n*w+2*n*d)*L # (m^2) # Jeff edited # entire wetted wall area -- for friction losses
+Aw_heat=(n*w+2*n*d)*L # (m^2) # Jeff edited # area for heat transfer
 
-print('Wetted area of duct is %f' %Awrect)
+print('Wetted area of duct is %f' %Aw_wet)
+print('Area for heat transfer is %f' %Aw_heat)
 
 #transfer units
 
-Nturect=(hcrect*Awrect)/(mdot*Cp)
+Nturect=(hcrect*Aw_heat)/(mdot*Cp)
 
 print('The transfer units is %f' %Nturect)
 
@@ -288,5 +297,3 @@ print('The heat transfer is %f W' %Qrect)
 dprect=(frect*L*Grect**2)/(Dhall*2*rho) #Pa
 
 print('The pressure drop is %f Pa.' %dprect)
-
-
