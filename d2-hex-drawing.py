@@ -4,6 +4,10 @@ from math import *
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+import numpy as np
+from scipy import interpolate
+from scipy.integrate import odeint
+
 d2=4.76*0.0254 # (m) inner diameter of the outer tubular housing
 d1=4.75*0.0254 # (m) diameter of the inner cold cylinder before
                # cutting any grooves
@@ -167,9 +171,9 @@ kt=0.104 # W/(m*K) a check on this number from
 
 # specific heat
 
-import CoolProp.CoolProp as CP
-import numpy as np
-fluid='Deuterium'
+#import CoolProp.CoolProp as CP
+#import numpy as np
+#fluid='Deuterium'
 
 p_psi=20. # PSI
 p=p_psi*6894.76 # Pa
@@ -182,7 +186,7 @@ Tw=20.7 # (K) temperature of cold wall
 
 T=Tin
 
-Cp=CP.PropsSI('C','P',p,'T',T,fluid) # (kg/(m*K)) found from coolprop -
+Cp=12 #CP.PropsSI('C','P',p,'T',T,fluid) # (kg/(m*K)) found from coolprop -
                                     # found via a table
 
 Pr=(mu*Cp)/(kt) # yes still dimensionless
@@ -244,7 +248,7 @@ print()
 #f=fRe/Re
 #print('The friction factor is %f'%f)
 
-rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
+rho=163 #CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
 print('The density is %f kg/m^3'%rho)
 
 dp=(f*L*G**2)/(dh*2*rho) # (Pa) pressure drop
@@ -258,7 +262,8 @@ dp=(f*L*G**2)/(dh*2*rho) # (Pa) pressure drop
 
 print('The pressure drop is %f Pa'%dp)
 
-#plt.show()
+plt.title('The Cross Section of the Heat Exchanger.')
+plt.show()
 
 
 
@@ -347,6 +352,46 @@ print('The heat transfer is %f W' %Qrect)
 dprect=(frect*L*Grect**2)/(Dhall*2*rho) #Pa
 
 print('The pressure drop is %f Pa.' %dprect)
+
+#heat conduction
+
+dTdx = -(Qtotal/(kt*a))
+
+
+print('The slope of the temperature curve is %f.' %dTdx)
+
+def ODE(T,x):
+
+   dTdx = float(-Qtotal/(kt*a) )
+   
+   return dTdx
+
+
+#inital conditions
+
+T0 = 19 # K
+
+x = np.arange(0, 10, 0.0001)
+solnT = odeint(ODE, T0, x) #from scipy
+z = interpolate.interp1d(x, solnT[:,0])
+
+#making callable function
+
+def T(x):
+    
+    T = z(x)
+    
+    return T
+
+plt.plot(T(x),x)
+plt.title('Temperature as a function of position')
+plt.show()
+
+
+
+
+
+
 
 
 
