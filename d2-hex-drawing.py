@@ -111,7 +111,7 @@ print()
 mdot=0.004 # (kg/s) mass flow rate
 G=mdot/a # (kg/(m^2*s)) mass flow rate per unit area
 
-print('G is %f kg/(m^2*s)'%G)
+print('Mass flux (G) is %f kg/(m^2*s)'%G)
 
 # 350 micro-poise at 20.5 K.... this is at saturation, but probably
 # close enough to 20 psia.
@@ -122,7 +122,39 @@ mu=3.5e-5 # Pa*s
 Re=dh*G/mu # should be dimensionless
 print('The Reynolds number is %f'%Re)
 
+fRe=24.00*4
 
+#Creating an elif for f based on Barron eq'ns
+
+if Re < 2300 :
+    f=fRe/Re
+    #f=64/Re #assuming cicular tube
+    print('The laminar friction factor is %f.' %f)
+elif 3500 > Re > 2300 :
+    print('The friction factor is in between laminar and turbulent')
+elif Re > 3500 :
+    f=0.316*Re**(-0.25)
+    print('The turbulent friction factor is %f.' %f)
+
+
+B1=1.174*((3.7e-5)/(3.68e-5))**(0.14) #viscosity taken from cams sheets
+print('This is B1 %f.' %B1)
+
+
+if Re < 3500 :
+    print('It is laminar or in between')
+elif Re > 3500 :
+    jh=0.023*Re**(-0.2)*B1
+    print('The Colburn factor for the turbulent flow is %f.' %jh)
+
+
+
+print()
+
+
+
+
+#all from Barron
 
 # thermal conductivity
 
@@ -146,6 +178,8 @@ Tin=23.4 # (K) inlet temp
 Tw=20.7 # (K) temperature of cold wall
 #Ts=(Tw+Tin)/2 # (K) temperature of film, with which we will exchange heat.
 
+
+
 T=Tin
 
 Cp=CP.PropsSI('C','P',p,'T',T,fluid) # (kg/(m*K)) found from coolprop -
@@ -156,6 +190,17 @@ Pr=(mu*Cp)/(kt) # yes still dimensionless
                # =((kg*m/(s^2*m^2))*s)*(W*s/(kg*K))*((m*K)/W) = 1
 
 print('The Prandtl Number is %f.'%Pr)
+
+
+#If turb
+
+if Re < 3500 :
+    print('Nu=4.8608 because the flow laminar')
+elif Re > 3500 :
+    Nuturb=jh*Re*Pr**(1/3)
+    print('This is the turbulent Nusselt Number %f.' %Nuturb)
+    
+print()
 
 #Nu_3_ii=4.8608 # Table 90 of Shah and London
 
@@ -171,8 +216,13 @@ Nu=4.8608 # Eq. (283) Shah and London, parallel plate one side insulated
 fRe=24.00*4 # Table Table 86 of Shah and London, thin annulus
 
 # calculate heat transfer -- inner surface to fluid
-hc=Nu*kt/dh
-print('The heat transfer coefficient is %f W/(m^2*K)'%hc)
+
+if Re < 3500 :
+    hc=Nu*kt/dh
+    print('The heat transfer coefficient for laminar flow is %f W/(m^2*K)'%hc)
+elif Re > 3500 :
+    hc=Nuturb*kt/dh
+    print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
 
 Ntu=hc*Aw/(mdot*Cp)
 print('The number of transfer units is %f'%Ntu)
@@ -191,8 +241,8 @@ print()
 
 # calculate pressure drop
 
-f=fRe/Re
-print('The friction factor is %f'%f)
+#f=fRe/Re
+#print('The friction factor is %f'%f)
 
 rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
 print('The density is %f kg/m^3'%rho)
@@ -297,3 +347,6 @@ print('The heat transfer is %f W' %Qrect)
 dprect=(frect*L*Grect**2)/(Dhall*2*rho) #Pa
 
 print('The pressure drop is %f Pa.' %dprect)
+
+
+
