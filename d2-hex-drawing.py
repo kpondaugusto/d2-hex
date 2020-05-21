@@ -358,7 +358,7 @@ print('The pressure drop is %f Pa.' %dprect)
 dTdx = -(Qtotal/(kt*a))
 
 
-print('The slope of the temperature curve is %f.' %dTdx)
+print('The slope of the temperature curve is %f K/m.' %dTdx)
 
 def ODE(T,x):
 
