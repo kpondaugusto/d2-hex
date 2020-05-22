@@ -8,8 +8,8 @@ import numpy as np
 from scipy import interpolate
 from scipy.integrate import odeint
 
-d2=4.76*0.0254 # (m) inner diameter of the outer tubular housing
-d1=4.75*0.0254 # (m) diameter of the inner cold cylinder before
+d2=.76*0.0254 # (m) inner diameter of the outer tubular housing
+d1=.75*0.0254 # (m) diameter of the inner cold cylinder before
                # cutting any grooves
 
 fig,ax=plt.subplots()
@@ -21,8 +21,8 @@ ax.set_ylim([-d2/2,d2/2])
 circle1=plt.Circle((0,0),d2/2,color='r',fill=False)
 ax.add_artist(circle1)
 
-groove_depth=0.1*0.0254 # m
-groove_width=0.06*0.0254 # m
+groove_depth=0.0006*0.0254 # m
+groove_width=0.0006*0.0254 # m
 n=ngrooves=124
 
 # shorter names
@@ -135,6 +135,7 @@ if Re < 2300 :
     #f=64/Re #assuming cicular tube
     print('The laminar friction factor is %f.' %f)
 elif 3500 > Re > 2300 :
+    f=1.2036*Re**(-0.416) #from vijayan
     print('The friction factor is in between laminar and turbulent')
 elif Re > 3500 :
     f=0.316*Re**(-0.25)
@@ -171,9 +172,9 @@ kt=0.104 # W/(m*K) a check on this number from
 
 # specific heat
 
-#import CoolProp.CoolProp as CP
-#import numpy as np
-#fluid='Deuterium'
+import CoolProp.CoolProp as CP
+import numpy as np
+fluid='Deuterium'
 
 p_psi=20. # PSI
 p=p_psi*6894.76 # Pa
@@ -186,7 +187,7 @@ Tw=20.7 # (K) temperature of cold wall
 
 T=Tin
 
-Cp=12 #CP.PropsSI('C','P',p,'T',T,fluid) # (kg/(m*K)) found from coolprop -
+Cp=CP.PropsSI('C','P',p,'T',T,fluid) # (kg/(m*K)) found from coolprop -
                                     # found via a table
 
 Pr=(mu*Cp)/(kt) # yes still dimensionless
@@ -222,10 +223,10 @@ fRe=24.00*4 # Table Table 86 of Shah and London, thin annulus
 # calculate heat transfer -- inner surface to fluid
 
 if Re < 3500 :
-    hc=Nu*kt/dh
+    hc=Nu*kt/dh # Barron eq'n 6.15
     print('The heat transfer coefficient for laminar flow is %f W/(m^2*K)'%hc)
 elif Re > 3500 :
-    hc=Nuturb*kt/dh
+    hc=Nuturb*kt/L # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
     print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
 
 Ntu=hc*Aw/(mdot*Cp)
@@ -248,7 +249,7 @@ print()
 #f=fRe/Re
 #print('The friction factor is %f'%f)
 
-rho=163 #CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
+rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
 print('The density is %f kg/m^3'%rho)
 
 dp=(f*L*G**2)/(dh*2*rho) # (Pa) pressure drop
