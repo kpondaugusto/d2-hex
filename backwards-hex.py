@@ -39,9 +39,9 @@ beta=4*Ntu/(Nu*kt/(mdot*Cp))
 
 #Aw/L*A**2=Pin/A**2=beta/alpha
 
-# take many fins limit Pin=~p
+# solve beta and alpha for A and Pin
 
-p=(beta**3/(alpha*L**2))**(1./5.)
-print(p)
-a=p**2*L/beta
+Pin=(beta**3/(alpha*p**2*L**2))**(1./3.)
+print(Pin)
+a=p*Pin*L/beta
 print(a)
