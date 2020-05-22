@@ -200,7 +200,7 @@ print('The Prandtl Number is %f.'%Pr)
 #If turb
 
 if Re < 3500 :
-    print('Nu=4.8608 because the flow laminar')
+    print('Nu=4.8608 because the flow is laminar')
 elif Re > 3500 :
     Nuturb=jh*Re*Pr**(1/3)
     print('This is the turbulent Nusselt Number %f.' %Nuturb)
@@ -226,7 +226,7 @@ if Re < 3500 :
     hc=Nu*kt/dh # Barron eq'n 6.15
     print('The heat transfer coefficient for laminar flow is %f W/(m^2*K)'%hc)
 elif Re > 3500 :
-    hc=Nuturb*kt/L # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
+    hc=Nuturb*kt/dh # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
     print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
 
 Ntu=hc*Aw/(mdot*Cp)
@@ -392,7 +392,7 @@ plt.show()
 
 
 
-
+print(Cp)
 
 
 
