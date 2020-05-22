@@ -77,10 +77,15 @@ fluid='Deuterium'
 
 p_psi=20. # PSI
 p=p_psi*6894.76 # Pa
-T=20 #K
-C=CP.PropsSI('C','P',p,'T',T,fluid) # (kg/(m*K)) found from coolprop -
+Tin=23.4 # (K) inlet temp
+Tw=20.7 # (K) temperature of cold wall
+#Ts=(Tw+Tin)/2 # (K) temperature of film, with which we will exchange heat.
+
+T=Tin
+
+Cp=CP.PropsSI('C','P',p,'T',T,fluid) # (kg/(m*K)) found from coolprop -
                                     # found via a table
-print('The specific heat is %f kg/mK.'%C)
+print('The specific heat is %f kg/mK.'%Cp)
 cd=CP.PropsSI('d(Hmass)/d(T)|P','P',p,'T',T,fluid) # (kg/(m*K)) found
                                                    # from coolprop -
                                                    # found via
@@ -106,7 +111,7 @@ print('The specific heat is %f kg/(m*K), found from derivatives.' %cd)
 
 #Prandtl Number
 
-Pr=(mu*C)/(kt) # yes still dimensionless
+Pr=(mu*Cp)/(kt) # yes still dimensionless
                # because (Pa*s)*(J/(kg*K))/(W/(m*K))
                # =((kg*m/(s^2*m^2))*s)*(W*s/(kg*K))*((m*K)/W) = 1
 
@@ -118,7 +123,7 @@ Nu=jH*Re*Pr**(1/3) #more dimentionless numbers
 
 print('The Nusselt Numebr is %f.'%Nu)
 
-ro=171#(kg/m^3) denstiy
+rho=171#(kg/m^3) denstiy
 
 L=0.0254*10 #(m) length of tube(s)
 
@@ -170,7 +175,7 @@ print('The friction factor from shah is %f.'%f_shah)
 
 #pressure drop
 
-p=(f_lam*L*G**2)/(dh*2*ro) #(Pa)
+dp=(f_lam*L*G**2)/(dh*2*rho) #(Pa)
 
 
 print('The pressure drop is %f Pa.'%p)
@@ -181,3 +186,12 @@ hc=(Nu*kt)/dh #W/m^2k
 
 print('The convective heat transfer coefficient is %f W/m^2K.'%hc)
 
+
+rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
+print('The density is %f kg/m^3'%rho)
+
+Tw=20.7
+
+D=CP.PropsSI('D','P',p,'T',Tw,fluid) # (kg/(m*K)) found from coolprop -
+                                    # found via a table
+print('The density is %f kg/m^3 at the wall.'%D)

@@ -4,8 +4,12 @@ from math import *
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-d2=4.76*0.0254 # (m) inner diameter of the outer tubular housing
-d1=4.75*0.0254 # (m) diameter of the inner cold cylinder before
+import numpy as np
+from scipy import interpolate
+from scipy.integrate import odeint
+
+d2=.76*0.0254 # (m) inner diameter of the outer tubular housing
+d1=.75*0.0254 # (m) diameter of the inner cold cylinder before
                # cutting any grooves
 
 fig,ax=plt.subplots()
@@ -17,8 +21,8 @@ ax.set_ylim([-d2/2,d2/2])
 circle1=plt.Circle((0,0),d2/2,color='r',fill=False)
 ax.add_artist(circle1)
 
-groove_depth=0.1*0.0254 # m
-groove_width=0.06*0.0254 # m
+groove_depth=0.0006*0.0254 # m
+groove_width=0.0006*0.0254 # m
 n=ngrooves=124
 
 # shorter names
@@ -111,7 +115,7 @@ print()
 mdot=0.004 # (kg/s) mass flow rate
 G=mdot/a # (kg/(m^2*s)) mass flow rate per unit area
 
-print('G is %f kg/(m^2*s)'%G)
+print('Mass flux (G) is %f kg/(m^2*s)'%G)
 
 # 350 micro-poise at 20.5 K.... this is at saturation, but probably
 # close enough to 20 psia.
@@ -122,7 +126,40 @@ mu=3.5e-5 # Pa*s
 Re=dh*G/mu # should be dimensionless
 print('The Reynolds number is %f'%Re)
 
+fRe=24.00*4
 
+#Creating an elif for f based on Barron eq'ns
+
+if Re < 2300 :
+    f=fRe/Re
+    #f=64/Re #assuming cicular tube
+    print('The laminar friction factor is %f.' %f)
+elif 3500 > Re > 2300 :
+    f=1.2036*Re**(-0.416) #from vijayan
+    print('The friction factor is in between laminar and turbulent')
+elif Re > 3500 :
+    f=0.316*Re**(-0.25)
+    print('The turbulent friction factor is %f.' %f)
+
+
+B1=1.174*((3.7e-5)/(3.68e-5))**(0.14) #viscosity taken from cams sheets
+print('This is B1 %f.' %B1)
+
+
+if Re < 3500 :
+    print('It is laminar or in between')
+elif Re > 3500 :
+    jh=0.023*Re**(-0.2)*B1
+    print('The Colburn factor for the turbulent flow is %f.' %jh)
+
+
+
+print()
+
+
+
+
+#all from Barron
 
 # thermal conductivity
 
@@ -146,6 +183,8 @@ Tin=23.4 # (K) inlet temp
 Tw=20.7 # (K) temperature of cold wall
 #Ts=(Tw+Tin)/2 # (K) temperature of film, with which we will exchange heat.
 
+
+
 T=Tin
 
 Cp=CP.PropsSI('C','P',p,'T',T,fluid) # (kg/(m*K)) found from coolprop -
@@ -156,6 +195,17 @@ Pr=(mu*Cp)/(kt) # yes still dimensionless
                # =((kg*m/(s^2*m^2))*s)*(W*s/(kg*K))*((m*K)/W) = 1
 
 print('The Prandtl Number is %f.'%Pr)
+
+
+#If turb
+
+if Re < 3500 :
+    print('Nu=4.8608 because the flow laminar')
+elif Re > 3500 :
+    Nuturb=jh*Re*Pr**(1/3)
+    print('This is the turbulent Nusselt Number %f.' %Nuturb)
+    
+print()
 
 #Nu_3_ii=4.8608 # Table 90 of Shah and London
 
@@ -171,8 +221,13 @@ Nu=4.8608 # Eq. (283) Shah and London, parallel plate one side insulated
 fRe=24.00*4 # Table Table 86 of Shah and London, thin annulus
 
 # calculate heat transfer -- inner surface to fluid
-hc=Nu*kt/dh
-print('The heat transfer coefficient is %f W/(m^2*K)'%hc)
+
+if Re < 3500 :
+    hc=Nu*kt/dh # Barron eq'n 6.15
+    print('The heat transfer coefficient for laminar flow is %f W/(m^2*K)'%hc)
+elif Re > 3500 :
+    hc=Nuturb*kt/L # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
+    print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
 
 Ntu=hc*Aw/(mdot*Cp)
 print('The number of transfer units is %f'%Ntu)
@@ -191,8 +246,8 @@ print()
 
 # calculate pressure drop
 
-f=fRe/Re
-print('The friction factor is %f'%f)
+#f=fRe/Re
+#print('The friction factor is %f'%f)
 
 rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
 print('The density is %f kg/m^3'%rho)
@@ -208,7 +263,8 @@ dp=(f*L*G**2)/(dh*2*rho) # (Pa) pressure drop
 
 print('The pressure drop is %f Pa'%dp)
 
-#plt.show()
+plt.title('The Cross Section of the Heat Exchanger.')
+plt.show()
 
 
 
@@ -297,3 +353,46 @@ print('The heat transfer is %f W' %Qrect)
 dprect=(frect*L*Grect**2)/(Dhall*2*rho) #Pa
 
 print('The pressure drop is %f Pa.' %dprect)
+
+#heat conduction
+
+dTdx = -(Qtotal/(kt*a))
+
+
+print('The slope of the temperature curve is %f K/m.' %dTdx)
+
+def ODE(T,x):
+
+   dTdx = float(-Qtotal/(kt*a) )
+   
+   return dTdx
+
+
+#inital conditions
+
+T0 = 19 # K
+
+x = np.arange(0, 10, 0.0001)
+solnT = odeint(ODE, T0, x) #from scipy
+z = interpolate.interp1d(x, solnT[:,0])
+
+#making callable function
+
+def T(x):
+    
+    T = z(x)
+    
+    return T
+
+plt.plot(T(x),x)
+plt.title('Temperature as a function of position')
+plt.show()
+
+
+
+
+
+
+
+
+
