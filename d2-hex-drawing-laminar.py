@@ -8,8 +8,8 @@ import numpy as np
 from scipy import interpolate
 from scipy.integrate import odeint
 
-d2=.6*0.0254 # (m) inner diameter of the outer tubular housing
-d1=.4*0.0254 # (m) diameter of the inner cold cylinder before
+d2=4.76*0.0254 # (m) inner diameter of the outer tubular housing
+d1=4.75*0.0254 # (m) diameter of the inner cold cylinder before
                # cutting any grooves
 
 fig,ax=plt.subplots()
@@ -22,8 +22,8 @@ circle1=plt.Circle((0,0),d2/2,color='r',fill=False)
 ax.add_artist(circle1)
 
 groove_depth=0.1*0.0254 # m
-groove_width=0.04*0.0254 # m
-n=ngrooves=10
+groove_width=0.06*0.0254 # m
+n=ngrooves=124
 
 # shorter names
 r=d1/2
@@ -98,6 +98,8 @@ print()
 
 a=area # (m^2) area for fluid flow
 p=perimeter+pi*d2 # (m) perimeter of flow region
+
+print(p,perimeter)
 
 dh=4*a/p # (m) hydraulic diameter
 
@@ -200,7 +202,7 @@ print('The Prandtl Number is %f.'%Pr)
 #If turb
 
 if Re < 3500 :
-    print('Nu=4.8608 because the flow is laminar')
+    print('Nu=4.8608 because the flow laminar')
 elif Re > 3500 :
     Nuturb=jh*Re*Pr**(1./3.)
     print('This is the turbulent Nusselt Number %f.' %Nuturb)
@@ -392,7 +394,7 @@ plt.show()
 
 
 
-print(Cp)
+
 
 
 
