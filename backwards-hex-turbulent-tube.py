@@ -44,11 +44,13 @@ L=Ntu/(Nu*kt*pi/(mdot*Cp))
 
 print('Tube length needed for sufficient heat transfer %f m'%L)
 
-f=0.04 # typical turbulent f near Re=3500.
+f=0.316*Re**(-0.25)
+print('The turbulent friction factor is %f.' %f)
 
 dp=(8*f*mdot**2/(rho*pi**2))*L/diameter**5 # tube
 print('Pressure drop %f Pa'%dp)
 
 dcoil=4.*0.0254 # m diameter of coiled tube
 turns=L/(pi*dcoil)
-print('Coiling around a HEX of diameter %f m would require %f turns'%(dcoil,turns))
+print('Coiling around a Cu rod of diameter %f m would require %f turns'%(dcoil,turns))
+print('This Cu rod would need to be at least %f m long (for zero Cu wall thickness)'%(turns*diameter))
