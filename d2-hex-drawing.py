@@ -8,8 +8,8 @@ import numpy as np
 from scipy import interpolate
 from scipy.integrate import odeint
 
-d2=.76*0.0254 # (m) inner diameter of the outer tubular housing
-d1=.75*0.0254 # (m) diameter of the inner cold cylinder before
+d2=.6*0.0254 # (m) inner diameter of the outer tubular housing
+d1=.4*0.0254 # (m) diameter of the inner cold cylinder before
                # cutting any grooves
 
 fig,ax=plt.subplots()
@@ -21,9 +21,9 @@ ax.set_ylim([-d2/2,d2/2])
 circle1=plt.Circle((0,0),d2/2,color='r',fill=False)
 ax.add_artist(circle1)
 
-groove_depth=0.0006*0.0254 # m
-groove_width=0.0006*0.0254 # m
-n=ngrooves=124
+groove_depth=0.1*0.0254 # m
+groove_width=0.04*0.0254 # m
+n=ngrooves=10
 
 # shorter names
 r=d1/2
@@ -202,7 +202,7 @@ print('The Prandtl Number is %f.'%Pr)
 if Re < 3500 :
     print('Nu=4.8608 because the flow laminar')
 elif Re > 3500 :
-    Nuturb=jh*Re*Pr**(1/3)
+    Nuturb=jh*Re*Pr**(1./3.)
     print('This is the turbulent Nusselt Number %f.' %Nuturb)
     
 print()
@@ -226,7 +226,7 @@ if Re < 3500 :
     hc=Nu*kt/dh # Barron eq'n 6.15
     print('The heat transfer coefficient for laminar flow is %f W/(m^2*K)'%hc)
 elif Re > 3500 :
-    hc=Nuturb*kt/L # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
+    hc=Nuturb*kt/dh # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
     print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
 
 Ntu=hc*Aw/(mdot*Cp)
