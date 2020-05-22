@@ -41,7 +41,7 @@ beta=4*Ntu/(Nu*kt/(mdot*Cp))
 
 # take many fins limit Pin=~p
 
-p=(beta**3/(alpha*L**2))*(1./5.)
+p=(beta**3/(alpha*L**2))**(1./5.)
 print(p)
 a=p**2*L/beta
 print(a)
