@@ -17,7 +17,15 @@ K180=(1.92**(1.13)+(167.48/Re)**1.13)**(1/1.13)
 
 print('This is the loss coefficient for a 180deg loop %f.' %K180)
 
+#Table 4.4 Vijayan nuclear government paper pg 21, turb flow i think
 
+#exp and cont same as below
+
+#90deg bend
+
+K902=0.9
+
+K1802=2.2
 
 # For sudden expansion from hydrualic_Resistance.pdf for turb??
 
@@ -41,8 +49,9 @@ Kcont=(1/2)*(1-A3/A1)**(3/4) #where A3 is area of pipe after contraction and a f
 print('This is the loss coefficient for a sudden contraction %f.' %Kcont)
 
 
+#from pic looks like 3 cont, 4 90, 1 180, and 1 exp
 
-Ktot=K90 + K180 + Kexp + Kcont
+Ktot=2*K902 + K1802 + Kexp + Kcont
 
 print('The loss coefficient for the whole loop is %f' %Ktot)
 
