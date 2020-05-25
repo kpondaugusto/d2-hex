@@ -356,10 +356,21 @@ print('The pressure drop is %f Pa.' %dprect)
 
 #heat conduction
 
-dTdx = -(Qtotal/(kt*a))
+dx= 2*0.0254
 
+kt300=50.214*100 #W/m⋅K
 
-print('The slope of the temperature curve is %f K/m.' %dTdx)
+dT = -(60/(kt300*a))*dx
+
+kt50 = 13.764*100 # W/m⋅K
+
+dT50 = -(60/(kt50*a))*dx
+
+print('The dT for Cu300 is %f K.' %dT)
+print('The dT for Cu50 is %f K.' %dT50)
+
+print(a*10000)
+
 
 def ODE(T,x):
 
@@ -392,7 +403,6 @@ plt.show()
 
 
 
-print(Cp)
 
 
 
