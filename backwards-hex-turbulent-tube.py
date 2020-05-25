@@ -53,15 +53,12 @@ print('Pressure drop %f Pa'%dp)
 dcoil=4.*0.0254 # m diameter of coiled tube
 turns=L/(pi*dcoil)
 
-print('Coiling around a HEX of diameter %f m would require %f turns'%(dcoil,turns))
-print()
-
 
 
 print('Coiling around a Cu rod of diameter %f m would require %f turns'%(dcoil,turns))
 print('This Cu rod would need to be at least %f m long (for zero Cu wall thickness)'%(turns*diameter))
 
-
+print()
 
 #optimizing diameter for preferred dp
 
@@ -69,6 +66,7 @@ dp2=10 #Pa
 mdot=0.004 # kg/s
 mu=3.5e-5 # Pa*s
 Ntu=3.0
+f=0.02 # following along in the example, have to guess an f 
 
 D=((8*f*mdot**2*L)/(rho*pi**2*dp2))**(1/5)
 
@@ -77,6 +75,8 @@ print('this is D %f m'%D)
 turns2=L/(pi*D)
 
 print('Coiling around a HEX of diameter %f m would require %f turns'%(D,turns2))
+print('This Cu rod would need to be at least %f m long (for zero Cu wall thickness)'%(turns2*D))
+
 
 Re2=(4*mdot)/(pi*D*mu)
 
@@ -90,5 +90,6 @@ print('According to correlations, Nu=%f'%Nu2)
 
 hc2=Nu*kt/D
 print('The heat transfer coefficient is %f W/m^2-K'%hc2)
+
 
 
