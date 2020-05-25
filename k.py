@@ -17,7 +17,7 @@ K180=(1.92**(1.13)+(167.48/Re)**1.13)**(1/1.13)
 
 print('This is the loss coefficient for a 180deg loop %f.' %K180)
 
-#Table 4.4 Vijayan nuclear government paper pg 21, turb flow i think
+#Table 4.4 Vijayan nuclear government paper pg 21, turb flow i think  https://inis.iaea.org/collection/NCLCollectionStore/_Public/32/004/32004813.pdf
 
 #exp and cont same as below
 
