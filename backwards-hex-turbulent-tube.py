@@ -66,16 +66,12 @@ dp2=10 #Pa
 mdot=0.004 # kg/s
 mu=3.5e-5 # Pa*s
 Ntu=3.0
-f=0.02 # following along in the example, have to guess an f 
+f=0.04 # following along in the example, have to guess an f
 
 D=((8*f*mdot**2*L)/(rho*pi**2*dp2))**(1/5)
 
 print('this is D %f m'%D)
 
-turns2=L/(pi*D)
-
-print('Coiling around a HEX of diameter %f m would require %f turns'%(D,turns2))
-print('This Cu rod would need to be at least %f m long (for zero Cu wall thickness)'%(turns2*D))
 
 
 Re2=(4*mdot)/(pi*D*mu)
@@ -88,8 +84,25 @@ jh2=0.023*Re2**(-0.2)*B1
 Nu2=jh2*Re2*Pr2**(1./3.)
 print('According to correlations, Nu=%f'%Nu2)
 
-hc2=Nu*kt/D
+#Ntu=hc*pi*D*L/(mdot*Cp)
+L2=Ntu/(Nu2*kt*pi/(mdot*Cp))
+
+print('Tube length needed for sufficient heat transfer %f m'%L)
+
+turns2=L2/(pi*D)
+
+print('Coiling around a HEX of diameter %f m would require %f turns'%(D,turns2))
+print('This Cu rod would need to be at least %f m long (for zero Cu wall thickness)'%(turns2*D))
+
+hc2=Nu2*kt/D
 print('The heat transfer coefficient is %f W/m^2-K'%hc2)
 
 
+Nu3=hc2*D/kt
 
+print('From example Nu=%f'%Nu3)
+
+
+QL=hc2*pi*D*L
+
+print('The heat transfer per temp is %f W/K' %QL)
