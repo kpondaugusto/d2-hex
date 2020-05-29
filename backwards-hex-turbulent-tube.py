@@ -31,7 +31,6 @@ jh=0.023*Re**(-0.2)*B1
 Nu=jh*Re*Pr**(1./3.)
 print('According to correlations, Nu=%f'%Nu)
 
-
 kt=0.104 # W/(m*K) a check on this number from
 
 Ntu=3.0
