@@ -200,7 +200,7 @@ print('The Prandtl Number is %f.'%Pr)
 #If turb
 
 if Re < 3500 :
-    print('Nu=4.8608 because the flow laminar')
+    print('Nu=4.8608 because the flow is laminar')
 elif Re > 3500 :
     Nuturb=jh*Re*Pr**(1./3.)
     print('This is the turbulent Nusselt Number %f.' %Nuturb)
@@ -356,10 +356,21 @@ print('The pressure drop is %f Pa.' %dprect)
 
 #heat conduction
 
-dTdx = -(Qtotal/(kt*a))
+dx= 2*0.0254
 
+kt300=50.214*100 #W/m⋅K
 
-print('The slope of the temperature curve is %f K/m.' %dTdx)
+dT = -(60/(kt300*a))*dx
+
+kt50 = 13.764*100 # W/m⋅K
+
+dT50 = -(60/(kt50*a))*dx
+
+print('The dT for Cu300 is %f K.' %dT)
+print('The dT for Cu50 is %f K.' %dT50)
+
+print(a*10000)
+
 
 def ODE(T,x):
 
@@ -387,7 +398,6 @@ def T(x):
 plt.plot(T(x),x)
 plt.title('Temperature as a function of position')
 plt.show()
-
 
 
 
