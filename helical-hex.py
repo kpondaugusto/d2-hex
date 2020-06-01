@@ -2,12 +2,13 @@
 
 from math import *
 
-import vpython
+
+from mpl_toolkits import mplot3d
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import CoolProp.CoolProp as CP
 import numpy as np
-from numpy import arcsin
+from numpy import *
 fluid='Deuterium'
 
 p_psi=20. # PSI
@@ -20,28 +21,26 @@ Tw=20.7 # (K) temperature of cold wall
 mdot=0.004 # kg/s
 mu=3.5e-5 # Pa*s
 
-L=4.322831 #m length of tube
+L=10*0.0254 #m length of tube
 
 rho=163.0 # kg/m^3
 
 Cp=6565.4 # J/(kg*K)
 
-N=30 #number of turns
+N=5 #number of turns
 
-Ngrooves=10 # number of grooves
+Ngrooves=1 # number of grooves
 
-D=0.4*0.0254 # 0.015949 #m diameter of tube, 0.015949 from optimizing dp in backwards-hex-turbulent-tube.py
+D=4.76*0.0254 # 0.015949 #m diameter of tube, 0.015949 from optimizing dp in backwards-hex-turbulent-tube.py
 
-d=.004*0.0254 # (m) diameter of the inner cold cylinder before
-# cutting any grooves
 
-wprime= 0.004*0.0254 #m width of groove
+wprime= 0.01 #m width of groove
 
-uprime=0.004*0.0254 # m width between grooves
+uprime= 0.01 # m width between grooves
 
-depth=0.04*0.0254 # m depth of groove
+depth=0.01 # m depth of groove
 
-sinalpha=(N*(wprime + uprime))/(pi*D) #pitch angle
+sinalpha=(Ngrooves*(wprime + uprime))/(pi*D) #pitch angle
 
 alpha=arcsin(sinalpha)
 
@@ -53,46 +52,34 @@ Lprime=L/sinalpha #m length of wound groove
 
 print('The length of the groove is %f m.' %Lprime)
 
+turns=Lprime/(pi*D)
 
-annulus=pi*(D**2-d**2)/4
+
+
+print('Coiling around a Cu rod of diameter %f m would require %f turns'%(D,turns))
 
 #based off of sketch w/ jeff
 
-Arect=Lprime*wprime # m^2
-
 w=wprime*tan(alpha) # m
 
-Atri=wprime**2*tan(alpha) # m^2
-
-ahelix=Lprime*depth #Arect+2*Atri ?? m^2 area of one helical groove/fin thing
+ahelix=Ngrooves*wprime*depth #Arect+2*Atri ?? m^2 area of one helical groove/fin thing
 
 print('The area of the helical fins is %f m^2.'%ahelix)
 
-A=area=annulus+(Ngrooves*ahelix) #m^2 total flow area
-print()
-print('The total area of the HEX is %f m^2.'%area)
-
-phelix=Ngrooves*(2*depth+w) #m
+phelix=Ngrooves*(2*depth+2*wprime) #m
 
 print('The perimeter of the helical grooves is %f m.' %phelix)
 
-p=pi*D #m perimeter of outter wall
 
-P=ptot=phelix + p
-
-print('The flow perimeter is %f m.' %ptot)
-
-
-Dh=4*A/P #m
+Dh=4*ahelix/phelix #m
 
 print('Hydraulic diameter %f m'%Dh)
 print()
 
-Aw=ptot*L
-print('Area of cold wall %f m^2'%Aw)
-print()
+#Aw=ptot*L
+#print('Area of cold wall %f m^2'%Aw)
 
-G=mdot/A # (kg/(m^2*s)) mass flow rate per unit area
+G=mdot/ahelix # (kg/(m^2*s)) mass flow rate per unit area
 
 print('Mass flux (G) is %f kg/(m^2*s)'%G)
 
@@ -157,20 +144,20 @@ elif Re > 3500 :
     hc=Nuturb*kt/Dh # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
     print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
 
-Ntu=hc*Aw/(mdot*Cp)
-print('The number of transfer units is %f'%Ntu)
-print()
+#Ntu=hc*Aw/(mdot*Cp)
+#print('The number of transfer units is %f'%Ntu)
+#print()
 
-T1=Tin
-T2=T1-(T1-Tw)*(1-exp(-Ntu))
+#T1=Tin
+#T2=T1-(T1-Tw)*(1-exp(-Ntu))
 #T2=Tw+(T1-Tw)*exp(-Ntu)
 
-Qtotal=mdot*Cp*(T1-T2) # Eq. (6.43) of Barron
+#Qtotal=mdot*Cp*(T1-T2) # Eq. (6.43) of Barron
 
-print('For inlet temperature %f K and wall temperature %f K'%(T1,Tw))
-print('the outlet temperature is %f K'%T2)
-print('and the total heat transfer rate is %f W'%Qtotal)
-print()
+#print('For inlet temperature %f K and wall temperature %f K'%(T1,Tw))
+#print('the outlet temperature is %f K'%T2)
+#print('and the total heat transfer rate is %f W'%Qtotal)
+#print()
 
 
 dp=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
@@ -185,13 +172,35 @@ dp=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
 print('The pressure drop is %f Pa'%dp)
 
 
+#finding optimal Ngrooves for optimal hc
+
+n = np.arange(1,5,1)
+
+
+hc = []
+
+for i in range(len(n)):
+
+    value=(Pr**(1/3)*B1*0.023*mdot**(0.8)*kt*2*(wprime+depth))/((2*mu*(wprime+depth)*n[i])**(0.8)*wprime*depth)
+    
+    hc.append(value)
+
+plt.plot(n, hc)
+
+plt.show()
 
 
 
+dp = []
 
+for i in range(len(n)):
 
+    value=(0.316*mdot**(7/8)*L*(wprime + depth)**(5/4)*mu**(-3/4)*2**(1/4)*n[i]**(-3/4))/((wprime*depth)**2*rho)
+    
+    dp.append(value)
 
+plt.plot(n, dp)
 
-
+plt.show()
 
 
