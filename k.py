@@ -37,8 +37,8 @@ Cp=CP.PropsSI('C','P',p,'T',T,fluid) # (kg/(m*K)) found from coolprop -
 #For the 1st constraction out of the HEX
 
 
-D= 0.5*0.0254 # m
-L= 1*0.0254 # m length i found i needed in backwards-hex-turbulent-tube.py
+D= 0.0381 # m
+L= 0.03946 # m length i found i needed in backwards-hex-turbulent-tube.py
 
 P=2*pi*D/2 # m
 
@@ -95,7 +95,7 @@ print()
 rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
 print('The density is %f kg/m^3'%rho)
 
-dp=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
+dp1=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
 # unit check:
 # [L]=m
 # [G**2]=kg^2/(s^2*m^4)
@@ -104,7 +104,7 @@ dp=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
 # So [p]=(kg^2/(s^2*m^3))/(kg/m^2)=kg/(s^2*m)=(kg*m/s^2)/m^2=[force]/[area]
 # =Pa (as expected)
 
-print('The pressure drop for the first sudden expansion is %f Pa'%dp)
+print('The pressure drop for the first sudden expansion is %f Pa'%dp1)
 
 
 print()
@@ -113,7 +113,7 @@ print()
 #For the 2nd contraction out of the HEX
 
 
-D= 0.5*0.0254 # m
+D= 0.0127 # m
 L= 1*0.0254 # m length i found i needed in backwards-hex-turbulent-tube.py
 
 P=2*pi*D/2 # m
@@ -171,7 +171,7 @@ print()
 rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
 print('The density is %f kg/m^3'%rho)
 
-dp=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
+dp2=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
 # unit check:
 # [L]=m
 # [G**2]=kg^2/(s^2*m^4)
@@ -180,7 +180,7 @@ dp=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
 # So [p]=(kg^2/(s^2*m^3))/(kg/m^2)=kg/(s^2*m)=(kg*m/s^2)/m^2=[force]/[area]
 # =Pa (as expected)
 
-print('The pressure drop for the second sudden expansion is %f Pa'%dp)
+print('The pressure drop for the second sudden expansion is %f Pa'%dp2)
 
 
 print()
@@ -189,6 +189,78 @@ print()
 #45 deg
 
 
+D= 0.00394 # m
+L= 1*0.0254 # m length i found i needed in backwards-hex-turbulent-tube.py
+
+P=2*pi*D/2 # m
+
+A=pi*D**2/4 # m^2
+
+
+
+Dh=4*A/P # m
+
+
+print('Flow area %f m^2'%A)
+print('Flow perimeter %f m'%P)
+print('Hydraulic diameter %f m'%Dh)
+print()
+
+G=mdot/A # (kg/(m^2*s)) mass flow rate per unit area
+
+
+print('Mass flux (G) is %f kg/(m^2*s)'%G)
+print()
+
+Re=Dh*G/mu # should be dimensionless
+print('The Reynolds number is %f'%Re)
+
+f=0.316*Re**(-0.25)
+print('The turbulent friction factor is %f.' %f)
+
+B1=1.174*((3.7e-5)/(3.68e-5))**(0.14) #viscosity taken from cams sheets
+print('This is B1 %f.' %B1)
+
+jh=0.023*Re**(-0.2)*B1
+print('The Colburn factor for the turbulent flow is %f.' %jh)
+
+
+Pr=(mu*Cp)/(kt) # yes still dimensionless
+               # because (Pa*s)*(J/(kg*K))/(W/(m*K))
+               # =((kg*m/(s^2*m^2))*s)*(W*s/(kg*K))*((m*K)/W) = 1
+
+print('The Prandtl Number is %f.'%Pr)
+
+Nuturb=jh*Re*Pr**(1./3.)
+print('This is the turbulent Nusselt Number %f.' %Nuturb)
+    
+print()
+
+hc=Nuturb*kt/Dh # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
+print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
+
+#Ntu=hc*Aw/(mdot*Cp)
+#print('The number of transfer units is %f'%Ntu)
+print()
+
+
+rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
+print('The density is %f kg/m^3'%rho)
+
+dp3=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
+# unit check:
+# [L]=m
+# [G**2]=kg^2/(s^2*m^4)
+# [dh]=m
+# [rho]=kg/m^3
+# So [p]=(kg^2/(s^2*m^3))/(kg/m^2)=kg/(s^2*m)=(kg*m/s^2)/m^2=[force]/[area]
+# =Pa (as expected)
+
+print('The pressure drop for the third sudden expansion is %f Pa'%dp3)
+
+
+print()
+
 
 
 
@@ -201,6 +273,78 @@ print()
 
 
 
+D= 0.00476 # m
+L= 1*0.0254 # m length i found i needed in backwards-hex-turbulent-tube.py
+
+P=2*pi*D/2 # m
+
+A=pi*D**2/4 # m^2
+
+
+
+Dh=4*A/P # m
+
+
+print('Flow area %f m^2'%A)
+print('Flow perimeter %f m'%P)
+print('Hydraulic diameter %f m'%Dh)
+print()
+
+G=mdot/A # (kg/(m^2*s)) mass flow rate per unit area
+
+
+print('Mass flux (G) is %f kg/(m^2*s)'%G)
+print()
+
+Re=Dh*G/mu # should be dimensionless
+print('The Reynolds number is %f'%Re)
+
+f=0.316*Re**(-0.25)
+print('The turbulent friction factor is %f.' %f)
+
+B1=1.174*((3.7e-5)/(3.68e-5))**(0.14) #viscosity taken from cams sheets
+print('This is B1 %f.' %B1)
+
+jh=0.023*Re**(-0.2)*B1
+print('The Colburn factor for the turbulent flow is %f.' %jh)
+
+
+Pr=(mu*Cp)/(kt) # yes still dimensionless
+               # because (Pa*s)*(J/(kg*K))/(W/(m*K))
+               # =((kg*m/(s^2*m^2))*s)*(W*s/(kg*K))*((m*K)/W) = 1
+
+print('The Prandtl Number is %f.'%Pr)
+
+Nuturb=jh*Re*Pr**(1./3.)
+print('This is the turbulent Nusselt Number %f.' %Nuturb)
+    
+print()
+
+hc=Nuturb*kt/Dh # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
+print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
+
+#Ntu=hc*Aw/(mdot*Cp)
+#print('The number of transfer units is %f'%Ntu)
+print()
+
+
+rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
+print('The density is %f kg/m^3'%rho)
+
+dp4=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
+# unit check:
+# [L]=m
+# [G**2]=kg^2/(s^2*m^4)
+# [dh]=m
+# [rho]=kg/m^3
+# So [p]=(kg^2/(s^2*m^3))/(kg/m^2)=kg/(s^2*m)=(kg*m/s^2)/m^2=[force]/[area]
+# =Pa (as expected)
+
+print('The pressure drop for the fourth sudden expansion is %f Pa'%dp4)
+
+
+print()
+
 
 #sudden exp
 
@@ -208,7 +352,153 @@ print()
 
 
 
+D= 189*0.0254 # m
+L= 791.7*0.0254 # m length i found i needed in backwards-hex-turbulent-tube.py
 
+P=2*pi*D/2 # m
+
+A=pi*D**2/4 # m^2
+
+
+
+Dh=4*A/P # m
+
+
+print('Flow area %f m^2'%A)
+print('Flow perimeter %f m'%P)
+print('Hydraulic diameter %f m'%Dh)
+print()
+
+G=mdot/A # (kg/(m^2*s)) mass flow rate per unit area
+
+
+print('Mass flux (G) is %f kg/(m^2*s)'%G)
+print()
+
+Re=Dh*G/mu # should be dimensionless
+print('The Reynolds number is %f'%Re)
+
+f=0.316*Re**(-0.25)
+print('The turbulent friction factor is %f.' %f)
+
+B1=1.174*((3.7e-5)/(3.68e-5))**(0.14) #viscosity taken from cams sheets
+print('This is B1 %f.' %B1)
+
+jh=0.023*Re**(-0.2)*B1
+print('The Colburn factor for the turbulent flow is %f.' %jh)
+
+
+Pr=(mu*Cp)/(kt) # yes still dimensionless
+               # because (Pa*s)*(J/(kg*K))/(W/(m*K))
+               # =((kg*m/(s^2*m^2))*s)*(W*s/(kg*K))*((m*K)/W) = 1
+
+print('The Prandtl Number is %f.'%Pr)
+
+Nuturb=jh*Re*Pr**(1./3.)
+print('This is the turbulent Nusselt Number %f.' %Nuturb)
+    
+print()
+
+hc=Nuturb*kt/Dh # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
+print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
+
+#Ntu=hc*Aw/(mdot*Cp)
+#print('The number of transfer units is %f'%Ntu)
+print()
+
+
+rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
+print('The density is %f kg/m^3'%rho)
+
+dp5=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
+# unit check:
+# [L]=m
+# [G**2]=kg^2/(s^2*m^4)
+# [dh]=m
+# [rho]=kg/m^3
+# So [p]=(kg^2/(s^2*m^3))/(kg/m^2)=kg/(s^2*m)=(kg*m/s^2)/m^2=[force]/[area]
+# =Pa (as expected)
+
+print('The pressure drop for the fifth sudden expansion is %f Pa'%dp5)
+
+
+print()
+
+
+
+#sudden cont
+
+
+
+
+D= 0.03175 # m
+L= 1.75 # m length i found i needed in backwards-hex-turbulent-tube.py
+
+P=2*pi*D/2 # m
+
+A=pi*D**2/4 # m^2
+
+
+
+Dh=4*A/P # m
+
+
+print('Flow area %f m^2'%A)
+print('Flow perimeter %f m'%P)
+print('Hydraulic diameter %f m'%Dh)
+print()
+
+G=mdot/A # (kg/(m^2*s)) mass flow rate per unit area
+
+
+print('Mass flux (G) is %f kg/(m^2*s)'%G)
+print()
+
+Re=Dh*G/mu # should be dimensionless
+print('The Reynolds number is %f'%Re)
+
+f=0.316*Re**(-0.25)
+print('The turbulent friction factor is %f.' %f)
+
+B1=1.174*((3.7e-5)/(3.68e-5))**(0.14) #viscosity taken from cams sheets
+print('This is B1 %f.' %B1)
+
+jh=0.023*Re**(-0.2)*B1
+print('The Colburn factor for the turbulent flow is %f.' %jh)
+
+
+Pr=(mu*Cp)/(kt) # yes still dimensionless
+               # because (Pa*s)*(J/(kg*K))/(W/(m*K))
+               # =((kg*m/(s^2*m^2))*s)*(W*s/(kg*K))*((m*K)/W) = 1
+
+print('The Prandtl Number is %f.'%Pr)
+
+Nuturb=jh*Re*Pr**(1./3.)
+print('This is the turbulent Nusselt Number %f.' %Nuturb)
+    
+print()
+
+hc=Nuturb*kt/Dh # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
+print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
+
+#Ntu=hc*Aw/(mdot*Cp)
+#print('The number of transfer units is %f'%Ntu)
+print()
+
+
+rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
+print('The density is %f kg/m^3'%rho)
+
+dp6=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
+# unit check:
+# [L]=m
+# [G**2]=kg^2/(s^2*m^4)
+# [dh]=m
+# [rho]=kg/m^3
+# So [p]=(kg^2/(s^2*m^3))/(kg/m^2)=kg/(s^2*m)=(kg*m/s^2)/m^2=[force]/[area]
+# =Pa (as expected)
+
+print('The pressure drop for the sixth sudden expansion is %f Pa'%dp6)
 
 
 
@@ -220,12 +510,82 @@ print()
 
 
 
+D= 0.03175 # m
+L= 5*0.0254 # m length i found i needed in backwards-hex-turbulent-tube.py
+
+P=2*pi*D/2 # m
+
+A=pi*D**2/4 # m^2
+
+
+
+Dh=4*A/P # m
+
+
+print('Flow area %f m^2'%A)
+print('Flow perimeter %f m'%P)
+print('Hydraulic diameter %f m'%Dh)
+print()
+
+G=mdot/A # (kg/(m^2*s)) mass flow rate per unit area
+
+
+print('Mass flux (G) is %f kg/(m^2*s)'%G)
+print()
+
+Re=Dh*G/mu # should be dimensionless
+print('The Reynolds number is %f'%Re)
+
+f=0.316*Re**(-0.25)
+print('The turbulent friction factor is %f.' %f)
+
+B1=1.174*((3.7e-5)/(3.68e-5))**(0.14) #viscosity taken from cams sheets
+print('This is B1 %f.' %B1)
+
+jh=0.023*Re**(-0.2)*B1
+print('The Colburn factor for the turbulent flow is %f.' %jh)
+
+
+Pr=(mu*Cp)/(kt) # yes still dimensionless
+               # because (Pa*s)*(J/(kg*K))/(W/(m*K))
+               # =((kg*m/(s^2*m^2))*s)*(W*s/(kg*K))*((m*K)/W) = 1
+
+print('The Prandtl Number is %f.'%Pr)
+
+Nuturb=jh*Re*Pr**(1./3.)
+print('This is the turbulent Nusselt Number %f.' %Nuturb)
+    
+print()
+
+hc=Nuturb*kt/Dh # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
+print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
+
+#Ntu=hc*Aw/(mdot*Cp)
+#print('The number of transfer units is %f'%Ntu)
+print()
+
+
+rho=CP.PropsSI('D','P',p,'T',T,fluid) # (kg/m^3)
+print('The density is %f kg/m^3'%rho)
+
+dp7=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
+# unit check:
+# [L]=m
+# [G**2]=kg^2/(s^2*m^4)
+# [dh]=m
+# [rho]=kg/m^3
+# So [p]=(kg^2/(s^2*m^3))/(kg/m^2)=kg/(s^2*m)=(kg*m/s^2)/m^2=[force]/[area]
+# =Pa (as expected)
+
+print('The pressure drop for the seventh sudden expansion is %f Pa'%dp7)
+print()
 
 
 
 
 
-#valve ? sudden exp ? 
+
+#valve ? sudden exp ?
 
 
 
@@ -246,6 +606,13 @@ print()
 
 
 
+print(dp1,dp2,dp3,dp4,dp5,dp6,dp7)
+
+dptot=dp1+dp2+dp3+dp4+dp5+dp6+dp7
+
+print('The total pressure drop is %f Pa' %dptot)
+
+print()
 
 # For 4 <= Re <= 512 from ASME
 
