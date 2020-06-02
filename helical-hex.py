@@ -2,8 +2,8 @@
 
 from math import *
 
-
 from mpl_toolkits import mplot3d
+
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import CoolProp.CoolProp as CP
@@ -27,18 +27,16 @@ rho=163.0 # kg/m^3
 
 Cp=6565.4 # J/(kg*K)
 
-N=5 #number of turns
-
 Ngrooves=1 # number of grooves
 
 D=4.76*0.0254 # 0.015949 #m diameter of tube, 0.015949 from optimizing dp in backwards-hex-turbulent-tube.py
 
 
-wprime= 0.01 #m width of groove
+wprime= 0.015 #m width of groove
 
 uprime= 0.01 # m width between grooves
 
-depth=0.01 # m depth of groove
+depth=0.015 # m depth of groove
 
 sinalpha=(Ngrooves*(wprime + uprime))/(pi*D) #pitch angle
 
@@ -56,11 +54,12 @@ turns=Lprime/(pi*D)
 
 
 
+
 print('Coiling around a Cu rod of diameter %f m would require %f turns'%(D,turns))
 
 #based off of sketch w/ jeff
 
-w=wprime*tan(alpha) # m
+w=wprime/sinalpha # m
 
 ahelix=Ngrooves*wprime*depth #Arect+2*Atri ?? m^2 area of one helical groove/fin thing
 
@@ -70,14 +69,13 @@ phelix=Ngrooves*(2*depth+2*wprime) #m
 
 print('The perimeter of the helical grooves is %f m.' %phelix)
 
-
 Dh=4*ahelix/phelix #m
 
 print('Hydraulic diameter %f m'%Dh)
 print()
 
-#Aw=ptot*L
-#print('Area of cold wall %f m^2'%Aw)
+
+
 
 G=mdot/ahelix # (kg/(m^2*s)) mass flow rate per unit area
 
@@ -119,6 +117,7 @@ print()
 
 Cp=CP.PropsSI('C','P',p,'T',T,fluid) # (kg/(m*K)) found from coolprop -
                                     # found via a table
+print(Cp)
 
 Pr=(mu*Cp)/(kt) # yes still dimensionless
                # because (Pa*s)*(J/(kg*K))/(W/(m*K))
@@ -144,23 +143,29 @@ elif Re > 3500 :
     hc=Nuturb*kt/Dh # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
     print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
 
-#Ntu=hc*Aw/(mdot*Cp)
-#print('The number of transfer units is %f'%Ntu)
-#print()
-
-#T1=Tin
-#T2=T1-(T1-Tw)*(1-exp(-Ntu))
-#T2=Tw+(T1-Tw)*exp(-Ntu)
-
-#Qtotal=mdot*Cp*(T1-T2) # Eq. (6.43) of Barron
-
-#print('For inlet temperature %f K and wall temperature %f K'%(T1,Tw))
-#print('the outlet temperature is %f K'%T2)
-#print('and the total heat transfer rate is %f W'%Qtotal)
-#print()
 
 
-dp=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
+Aw=Ngrooves*(wprime+2*depth)*Lprime
+print('Area of cold wall %f m^2'%Aw)
+
+
+Ntu=hc*Aw/(mdot*Cp)
+print('The number of transfer units is %f'%Ntu)
+print()
+
+T1=Tin
+T2=T1-(T1-Tw)*(1-exp(-Ntu))
+T2=Tw+(T1-Tw)*exp(-Ntu)
+
+Qtotal=mdot*Cp*(T1-T2) # Eq. (6.43) of Barron
+
+print('For inlet temperature %f K and wall temperature %f K'%(T1,Tw))
+print('the outlet temperature is %f K'%T2)
+print('and the total heat transfer rate is %f W'%Qtotal)
+print()
+
+
+dp=(f*Lprime*G**2)/(Dh*2*rho) # (Pa) pressure drop
 # unit check:
 # [L]=m
 # [G**2]=kg^2/(s^2*m^4)
@@ -181,26 +186,57 @@ hc = []
 
 for i in range(len(n)):
 
-    value=(Pr**(1/3)*B1*0.023*mdot**(0.8)*kt*2*(wprime+depth))/((2*mu*(wprime+depth)*n[i])**(0.8)*wprime*depth)
+    value=(Pr**(1./3.)*B1*0.023*(mdot*2)**(0.8)*kt*(wprime+depth))/((mu*(wprime+depth)*n[i])**(0.8)*wprime*depth*2)
     
     hc.append(value)
 
 plt.plot(n, hc)
-
+plt.title('hc as a function of Ngrooves')
+plt.xlabel('Ngrooves')
+plt.ylabel('hc')
 plt.show()
 
+
+
+def hc(n,a1):
+
+    value=(Pr**(1./3.)*B1*0.023*(mdot*2)**(0.8)*kt*(wprime+depth))/((mu*(wprime+depth)*n)**(0.8)*a1*2)
+
+    return value
+
+n = np.arange(1,10,1)
+
+a1 = np.arange(0.0001,0.001,0.0001)
+
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+ax.plot3D(n, a1, hc(n,a1), 'black')
+#ax.contour3D( n, a1, hc, 50, cmap='binary')
+plt.show()
+
+plt.plot(n, hc(n,wprime*depth))
+plt.title('hc as a function of Ngrooves')
+plt.xlabel('Ngrooves')
+plt.ylabel('hc')
+plt.show()
+
+plt.plot(a1, hc(1,a1))
+plt.title('hc as a function of a1')
+plt.xlabel('a1')
+plt.ylabel('hc')
+plt.show()
 
 
 dp = []
 
 for i in range(len(n)):
 
-    value=(0.316*mdot**(7/8)*L*(wprime + depth)**(5/4)*mu**(-3/4)*2**(1/4)*n[i]**(-3/4))/((wprime*depth)**2*rho)
+    value=(0.316*mdot**(7/4)*L*pi*D*(wprime + depth)**(5/4)*mu**(1/4)*2**(3/4))/(8*(wprime+uprime)*(wprime*depth)**(3)*rho*n[i]**(11/4))
     
     dp.append(value)
 
 plt.plot(n, dp)
-
+plt.title('dp as a function of Ngrooves')
+plt.xlabel('Ngrooves')
+plt.ylabel('dp')
 plt.show()
-
-
