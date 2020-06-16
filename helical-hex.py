@@ -3,7 +3,8 @@
 from math import *
 
 from mpl_toolkits import mplot3d
-
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import CoolProp.CoolProp as CP
@@ -179,23 +180,11 @@ print('The pressure drop is %f Pa'%dp)
 
 #finding optimal Ngrooves for optimal hc
 
-n = np.arange(1,5,1)
 
 
-hc = []
+n = np.arange(1,10,1)
 
-for i in range(len(n)):
-
-    value=(Pr**(1./3.)*B1*0.023*(mdot*2)**(0.8)*kt*(wprime+depth))/((mu*(wprime+depth)*n[i])**(0.8)*wprime*depth*2)
-    
-    hc.append(value)
-
-plt.plot(n, hc)
-plt.title('hc as a function of Ngrooves')
-plt.xlabel('Ngrooves')
-plt.ylabel('hc')
-plt.show()
-
+a1 = np.arange(0.0001,0.001,0.0001)
 
 
 def hc(n,a1):
@@ -203,16 +192,7 @@ def hc(n,a1):
     value=(Pr**(1./3.)*B1*0.023*(mdot*2)**(0.8)*kt*(wprime+depth))/((mu*(wprime+depth)*n)**(0.8)*a1*2)
 
     return value
-
-n = np.arange(1,10,1)
-
-a1 = np.arange(0.0001,0.001,0.0001)
-
-fig = plt.figure()
-ax = plt.axes(projection='3d')
-ax.plot3D(n, a1, hc(n,a1), 'black')
-#ax.contour3D( n, a1, hc, 50, cmap='binary')
-plt.show()
+    
 
 plt.plot(n, hc(n,wprime*depth))
 plt.title('hc as a function of Ngrooves')
@@ -221,22 +201,49 @@ plt.ylabel('hc')
 plt.show()
 
 plt.plot(a1, hc(1,a1))
-plt.title('hc as a function of a1')
+plt.title('hc as a function of a1 for N=1')
 plt.xlabel('a1')
 plt.ylabel('hc')
 plt.show()
 
 
-dp = []
+plt.plot(a1, hc(2,a1))
+plt.title('hc as a function of a1 w/ N=2')
+plt.xlabel('a1')
+plt.ylabel('hc')
+plt.show()
 
-for i in range(len(n)):
+#hcvalue = np.array(hc(1,0.0001),hc(1,0.0002),hc(1,0.0003),hc(1,0.0004),hc(1,0.0005),hc(1,0.0006),hc(1,0.0007),hc(1,0.0008),hc(1,0.0009),hc(1,0.001),hc(2,0.0001),hc(2,0.0002),hc(2,0.0003),hc(2,0.0004),hc(2,0.0005),hc(2,0.0006),hc(2,0.0007),hc(2,0.0008),hc(2,0.0009),hc(2,0.001))
 
-    value=(0.316*mdot**(7/4)*L*pi*D*(wprime + depth)**(5/4)*mu**(1/4)*2**(3/4))/(8*(wprime+uprime)*(wprime*depth)**(3)*rho*n[i]**(11/4))
+
+
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+#ax.plot3D(n, a1, hcvalue, 'black')
+#Axes3D.plot_trisurf(n, a1, hcvalue)
+#ax.plot_surface( n, a1, hc2d, 50, cmap='binary')
+#ax.plot_trisurf(n, a1, hc(n,a1), cmap = cm.jet)
+plt.show()
+
+
+#print(hc(n,a1))
+
+
+def dp(n,a1):
+
+    value=(0.316*mdot**(7/4)*L*pi*D*(wprime + depth)**(5/4)*mu**(1/4)*2**(3/4))/(8*(wprime+uprime)*(a1)**(3)*rho*n**(11/4))
     
-    dp.append(value)
+    return value
 
-plt.plot(n, dp)
+plt.plot(n, dp(n,wprime*depth))
 plt.title('dp as a function of Ngrooves')
 plt.xlabel('Ngrooves')
+plt.ylabel('dp')
+plt.show()
+
+
+plt.plot(a1, dp(1,a1))
+plt.title('dp as a function of a1')
+plt.xlabel('a1')
 plt.ylabel('dp')
 plt.show()
