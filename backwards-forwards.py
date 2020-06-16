@@ -22,14 +22,13 @@ Tw=20.7 # (K) temperature of cold wall
 #Taking D from optimizing dp in backwards-hex-turbulent-tube.py
 
 
-D=0.015949 # m
+D=0.015949 # m diameter of the pipe ?
 L=4.322831 # m length i found i needed in backwards-hex-turbulent-tube.py
 
-P=2*pi*D/2 # m
+P=2*pi*D/2 # m of pipe
 
-a=pi*D**2/4 # m^2
+A=pi*D**2/4 # m^2 area of liquid flowing through pipe
 
-acoil=
 
 kt=0.104 # W/(m*K) a check on this number from
 
