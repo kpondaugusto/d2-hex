@@ -57,14 +57,13 @@ print('The length of the groove is %f m.' %Lprime)
 
 turns=Lprime/(pi*D)
 
-
-
-
 print('Coiling around a Cu rod of diameter %f m would require %f turns'%(D,turns))
 
 #based off of sketch w/ jeff
 
 w=wprime/sinalpha # m
+
+print(w)
 
 ahelix=Ngrooves*wprime*depth #Arect+2*Atri ?? m^2 area of one helical groove/fin thing
 
@@ -88,18 +87,20 @@ Re=Dh*G/mu # should be dimensionless
 print('The Reynolds number is %f'%Re)
 print()
 
-rsq = R**2 + R**2
-
-r = sqrt(rsq)
 
 rofc = 2 + ((2*R) + (R**2)/2)/(pi)
 
-Recritmin = 2100*(1 + 12/(D/Dh)**(0.5))
+print(rofc)
+Recritmin = 2100*(1 + 12/((D/Dh)**(0.5)))
 
-#print('The critical Re Number is %f.' %Recritmin)
+print('The critical Re Number is %f.' %Recritmin)
 
 
 print('R/a is %f' %(D/Dh))
+
+print('R/d is %f' %(R/Dh))
+
+print('a/R is %f' %(Dh/D))
 
 #Dean number
 
@@ -108,39 +109,84 @@ De=Re*sqrt(Dh/D)
 print('The Deans number is %f.' %De)
 
 
+if Re < Recritmin :
+    if De < 30 :
+        f = 1
+        if Re < 2300 :
+            fs=fRe/Re
+            #f=64/Re #assuming cicular tube
+            print('The laminar friction factor is %f.' %fs)
+        elif 3500 > Re > 2300 :
+            fs=1.2036*Re**(-0.416) #from vijayan
+            print('The friction factor is in between laminar and turbulent')
+        elif Re > 3500 :
+            fs=0.316*Re**(-0.25)
+            print('The turbulent friction factor is %f.' %fs)
+        fc = 4*f*fs
+        pythoprint('f is %f'%fc)
+    elif 30 < De < 300 :
+        f = 0.419*De**(0.275)
+        if Re < 2300 :
+            fs=fRe/Re
+            #f=64/Re #assuming cicular tube
+            print('The laminar friction factor is %f.' %fs)
+        elif 3500 > Re > 2300 :
+            fs=1.2036*Re**(-0.416) #from vijayan
+            print('The friction factor is in between laminar and turbulent')
+        elif Re > 3500 :
+            fs=0.316*Re**(-0.25)
+            print('The turbulent friction factor is %f.' %fs)
+        fc = 4*f*fs
+        print('f is %f'%fc)
+    elif De > 300 :
+        f = 0.1125*De**(0.5)
+        if Re < 2300 :
+            fs=fRe/Re
+            #f=64/Re #assuming cicular tube
+            print('The laminar friction factor is %f.' %fs)
+        elif 3500 > Re > 2300 :
+            fs=1.2036*Re**(-0.416) #from vijayan
+            print('The friction factor is in between laminar and turbulent')
+        elif Re > 3500 :
+            fs=0.316*Re**(-0.25)
+            print('The turbulent friction factor is %f.' %fs)
+        fc = 4*f*fs
+        print('f is %f'%fc)
+elif Re > Recritmin :
+    f = 0.00725 + 0.076*(Re*(D/Dh)**(-2))**(-0.25)
+    fc = 4*f*(Dh/D)**(1/2)
+    print('f is %f'%fc)
 
-f = 0.00725 + 0.076*(Re*(D/Dh)**(-2))**(-0.25)
 
 
-print(Re*(D/Dh)**(-2))
-
-
-print()
+#print(Re*(D/Dh)**(-2))
 
 muw=3.68e-5
 
-Cpw=CP.PropsSI('C','P',p,'T',Tw,fluid) # (kg/(m*K)) found from coolprop -
-# found via a table
+Cpw=CP.PropsSI('C','P',p,'T',Tw,fluid) # (kg/(m*K))
 #print(Cpw)
-
 Pr=Prw=(muw*Cpw)/(kt)
 
 Prb=(mu*Cp)/kt
 
-
+print('Pr is %f' %Pr)
 print('This is fc(R/a)^-1/2 %f' %f)
 
-f2 = 0.084*(Re*(D/Dh)**(-2))**(-0.2)
+if Re > Recritmin :
+    f2 = 0.084*(Re*(D/Dh)**(-2))**(-0.2)
+    print('This is fc(R/a)^-1/2 %f w/ 2nd correlation' %f2)
+    fc2 = 4*f2*(Dh/D)**(1/2)
+    print('f2 is %f'%fc2)
 
-print('This is fc(R/a)^-1/2 %f w/ 2nd correlation' %f2)
-
-fc = 4*f*(Dh/D)**(1/2)
-
-print('f is %f'%fc)
-
-Nu = (1 + 3.4 * (Dh/D))*(Prb/Prw)**(0.25)
-
-print('This is Nuc/Nus %f' %Nu)
+if Re < Recritmin :
+    Nu = ( (3.657+(4.343/(1 + 957/(Pr*De**2))**2))**3 + (1.158*(De/(1 + (0.447/Pr)))**(3/2)) )**(1/3)
+    print('This is Nuc/Nus %f' %Nu)
+elif Re > Recritmin :
+    Nu = (1 + 3.4 * (Dh/D))*(Prb/Prw)**(0.25)
+    print('This is Nuc/Nus %f' %Nu)
+    
+#Nu = ( (4.364+(4.636/(1 + 1342/(Pr*De**2))**2))**3 + (1.816*(De/(1 + (1.15/Pr)))**(3/2)) )**(1/3)
+#print('This is Nuc/Nus %f' %Nu)
 
 B1=1.174*((3.7e-5)/(3.68e-5))**(0.14)
 
@@ -164,9 +210,15 @@ dp = (fc*Lprime*rho*u**2)/(2*Dh)
 
 print('the pressure drop is %f Pa' %dp)
 
-dp=(fc*Lprime*G**2)/(Dh*2*rho) # (Pa) pressure drop
 
-print('The pressure drop is %f Pa'%dp)
+#dp2 = (fc2*Lprime*rho*u**2)/(2*Dh)
+
+
+#print('the pressure drop is %f Pa' %dp2)
+
+#dp=(fc*Lprime*G**2)/(Dh*2*rho) # (Pa) pressure drop
+
+#print('The pressure drop is %f Pa'%dp)
 
 
 print()
@@ -197,24 +249,42 @@ print('the outlet temperature is %f K'%T2)
 print('and the total heat transfer rate is %f W'%Qtotal)
 print()
 
+alpha2 = pi/2
+
+alpha
+
+def calc_angles(a,b,c):
+    alpha2 = pi/2
+    beta = alpha
+    gamma = np.pi-alpha-beta
+    return alpha2, beta, gamma
+
+def calc_point(alpha, beta, c):
+    x = (c*np.tan(beta) )/( np.tan(alpha2)+np.tan(beta) )
+    y = x * np.tan(alpha2)
+    return (x,y)
+
+def get_triangle(a,b,c):
+    z = np.array([a,b,c])
+    while z[-1] != z.max():
+        z = z[[2,0,1]] # make sure last entry is largest
+    alpha2, beta, _ = calc_angles(*z)
+    x,y = calc_point(alpha2, beta, z[-1])
+    return [(0,0), (z[-1],0), (x,y)]
+
+a = Lprime
+b = L
+c = sqrt(Lprime**2-L**2)
 
 
-n = 100
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+fig, ax = plt.subplots()
+ax.set_aspect("equal")
 
-# Plot a helix along the x-axis
-theta = np.linspace(0, 8*pi, n)
-x =  theta
-z =  np.sin(theta)
-y =  np.cos(theta)
-ax.plot( y, z, x, 'b', lw=2)
-
-
-# Remove axis planes, ticks and labels
-ax.set_axis_off()
+dreieck = plt.Polygon(get_triangle(a,b,c))
+ax.add_patch(dreieck)
+ax.relim()
+ax.autoscale_view()
 #plt.show()
-
 
 
 
