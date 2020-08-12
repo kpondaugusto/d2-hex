@@ -2,12 +2,14 @@
 
 from math import *
 
-import vpython
+from mpl_toolkits import mplot3d
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import CoolProp.CoolProp as CP
 import numpy as np
-from numpy import arcsin
+from numpy import *
 fluid='Deuterium'
 
 p_psi=20. # PSI
@@ -20,28 +22,24 @@ Tw=20.7 # (K) temperature of cold wall
 mdot=0.004 # kg/s
 mu=3.5e-5 # Pa*s
 
-L=4.322831 #m length of tube
+L=10*0.0254 #m length of tube
 
 rho=163.0 # kg/m^3
 
 Cp=6565.4 # J/(kg*K)
 
-N=30 #number of turns
+Ngrooves=1 # number of grooves
 
-Ngrooves=10 # number of grooves
+D=4.76*0.0254 # 0.015949 #m diameter of tube, 0.015949 from optimizing dp in backwards-hex-turbulent-tube.py
 
-D=0.4*0.0254 # 0.015949 #m diameter of tube, 0.015949 from optimizing dp in backwards-hex-turbulent-tube.py
 
-d=.004*0.0254 # (m) diameter of the inner cold cylinder before
-# cutting any grooves
+wprime= 0.015 #m width of groove
 
-wprime= 0.004*0.0254 #m width of groove
+uprime= 0.01 # m width between grooves
 
-uprime=0.004*0.0254 # m width between grooves
+depth=0.015 # m depth of groove
 
-depth=0.04*0.0254 # m depth of groove
-
-sinalpha=(N*(wprime + uprime))/(pi*D) #pitch angle
+sinalpha=(Ngrooves*(wprime + uprime))/(pi*D) #pitch angle
 
 alpha=arcsin(sinalpha)
 
@@ -53,46 +51,34 @@ Lprime=L/sinalpha #m length of wound groove
 
 print('The length of the groove is %f m.' %Lprime)
 
+turns=Lprime/(pi*D)
 
-annulus=pi*(D**2-d**2)/4
+
+
+
+print('Coiling around a Cu rod of diameter %f m would require %f turns'%(D,turns))
 
 #based off of sketch w/ jeff
 
-Arect=Lprime*wprime # m^2
+w=wprime/sinalpha # m
 
-w=wprime*tan(alpha) # m
-
-Atri=wprime**2*tan(alpha) # m^2
-
-ahelix=Lprime*depth #Arect+2*Atri ?? m^2 area of one helical groove/fin thing
+ahelix=Ngrooves*wprime*depth #Arect+2*Atri ?? m^2 area of one helical groove/fin thing
 
 print('The area of the helical fins is %f m^2.'%ahelix)
 
-A=area=annulus+(Ngrooves*ahelix) #m^2 total flow area
-print()
-print('The total area of the HEX is %f m^2.'%area)
-
-phelix=Ngrooves*(2*depth+w) #m
+phelix=Ngrooves*(2*depth+2*wprime) #m
 
 print('The perimeter of the helical grooves is %f m.' %phelix)
 
-p=pi*D #m perimeter of outter wall
-
-P=ptot=phelix + p
-
-print('The flow perimeter is %f m.' %ptot)
-
-
-Dh=4*A/P #m
+Dh=4*ahelix/phelix #m
 
 print('Hydraulic diameter %f m'%Dh)
 print()
 
-Aw=ptot*L
-print('Area of cold wall %f m^2'%Aw)
-print()
 
-G=mdot/A # (kg/(m^2*s)) mass flow rate per unit area
+
+
+G=mdot/ahelix # (kg/(m^2*s)) mass flow rate per unit area
 
 print('Mass flux (G) is %f kg/(m^2*s)'%G)
 
@@ -132,6 +118,7 @@ print()
 
 Cp=CP.PropsSI('C','P',p,'T',T,fluid) # (kg/(m*K)) found from coolprop -
                                     # found via a table
+print(Cp)
 
 Pr=(mu*Cp)/(kt) # yes still dimensionless
                # because (Pa*s)*(J/(kg*K))/(W/(m*K))
@@ -157,13 +144,19 @@ elif Re > 3500 :
     hc=Nuturb*kt/Dh # Barron eq'n 6.17 makes it incredibly tiny compared to eq'n 6.15 maybe should be using eq'n 6.40 ??
     print('The heat transfer coefficient for turbulent flow is %f W/(m^2*K)'%hc)
 
+
+
+Aw=Ngrooves*(wprime+2*depth)*Lprime
+print('Area of cold wall %f m^2'%Aw)
+
+
 Ntu=hc*Aw/(mdot*Cp)
 print('The number of transfer units is %f'%Ntu)
 print()
 
 T1=Tin
 T2=T1-(T1-Tw)*(1-exp(-Ntu))
-#T2=Tw+(T1-Tw)*exp(-Ntu)
+T2=Tw+(T1-Tw)*exp(-Ntu)
 
 Qtotal=mdot*Cp*(T1-T2) # Eq. (6.43) of Barron
 
@@ -173,7 +166,7 @@ print('and the total heat transfer rate is %f W'%Qtotal)
 print()
 
 
-dp=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
+dp=(f*Lprime*G**2)/(Dh*2*rho) # (Pa) pressure drop
 # unit check:
 # [L]=m
 # [G**2]=kg^2/(s^2*m^4)
@@ -185,13 +178,72 @@ dp=(f*L*G**2)/(Dh*2*rho) # (Pa) pressure drop
 print('The pressure drop is %f Pa'%dp)
 
 
+#finding optimal Ngrooves for optimal hc
 
 
 
+n = np.arange(1,10,1)
+
+a1 = np.arange(0.0001,0.001,0.0001)
+
+
+def hc(n,a1):
+
+    value=(Pr**(1./3.)*B1*0.023*(mdot*2)**(0.8)*kt*(wprime+depth))/((mu*(wprime+depth)*n)**(0.8)*a1*2)
+
+    return value
+    
+
+plt.plot(n, hc(n,wprime*depth))
+plt.title('hc as a function of Ngrooves')
+plt.xlabel('Ngrooves')
+plt.ylabel('hc')
+plt.show()
+
+plt.plot(a1, hc(1,a1))
+plt.title('hc as a function of a1 for N=1')
+plt.xlabel('a1')
+plt.ylabel('hc')
+plt.show()
+
+
+plt.plot(a1, hc(2,a1))
+plt.title('hc as a function of a1 w/ N=2')
+plt.xlabel('a1')
+plt.ylabel('hc')
+plt.show()
+
+#hcvalue = np.array(hc(1,0.0001),hc(1,0.0002),hc(1,0.0003),hc(1,0.0004),hc(1,0.0005),hc(1,0.0006),hc(1,0.0007),hc(1,0.0008),hc(1,0.0009),hc(1,0.001),hc(2,0.0001),hc(2,0.0002),hc(2,0.0003),hc(2,0.0004),hc(2,0.0005),hc(2,0.0006),hc(2,0.0007),hc(2,0.0008),hc(2,0.0009),hc(2,0.001))
 
 
 
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+#ax.plot3D(n, a1, hcvalue, 'black')
+#Axes3D.plot_trisurf(n, a1, hcvalue)
+#ax.plot_surface( n, a1, hc2d, 50, cmap='binary')
+#ax.plot_trisurf(n, a1, hc(n,a1), cmap = cm.jet)
+plt.show()
 
 
+#print(hc(n,a1))
 
 
+def dp(n,a1):
+
+    value=(0.316*mdot**(7/4)*L*pi*D*(wprime + depth)**(5/4)*mu**(1/4)*2**(3/4))/(8*(wprime+uprime)*(a1)**(3)*rho*n**(11/4))
+    
+    return value
+
+plt.plot(n, dp(n,wprime*depth))
+plt.title('dp as a function of Ngrooves')
+plt.xlabel('Ngrooves')
+plt.ylabel('dp')
+plt.show()
+
+
+plt.plot(a1, dp(1,a1))
+plt.title('dp as a function of a1')
+plt.xlabel('a1')
+plt.ylabel('dp')
+plt.show()

@@ -65,7 +65,7 @@ dp2=10 #Pa
 mdot=0.004 # kg/s
 mu=3.5e-5 # Pa*s
 Ntu=3.0
-f=0.04 # following along in the example, have to guess an f
+f=0.03 # following along in the example, have to guess an f
 
 D=((8*f*mdot**2*L)/(rho*pi**2*dp2))**(1/5)
 
@@ -97,10 +97,13 @@ hc2=Nu2*kt/D
 print('The heat transfer coefficient is %f W/m^2-K'%hc2)
 
 
-Nu3=hc2*D/kt
+Nu3=0.023*Re2**(0.8)*Pr2**(0.3)
 
 print('From example Nu=%f'%Nu3)
 
+
+h=(0.023*4**(0.8)*mdot**(0.8)*Pr2**(0.3)*kt)/(D*D**(0.8)*pi**(0.8)*mu**(0.8))
+print(h)
 
 QL=hc2*pi*D*L
 
